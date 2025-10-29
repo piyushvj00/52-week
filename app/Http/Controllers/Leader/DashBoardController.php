@@ -20,8 +20,13 @@ class DashBoardController extends Controller
     {
         $portalSet = PortalSet::where('is_active',1)->first();
         $group = Group::where('leader_id',auth()->user()->id)->first();
-        $groupMember = GroupMember::where('group_id',$group->id)->count();
-        $contribution = Contribution::whereIn('group_id',$group)->sum('amount');
+        if(!$group){
+            $groupMember = 0;
+            $contribution = 0;
+            return view("leader.dashboard",compact('portalSet','contribution','groupMember'));
+        }
+        $groupMember = GroupMember::where('group_id',$group->id)->count() ?? 0;
+        $contribution = Contribution::whereIn('group_id',$group)->sum('amount') ?? 0;
  
         return view("leader.dashboard",compact('portalSet','contribution','groupMember'));
     }

@@ -27,6 +27,10 @@ use App\Http\Controllers\User\DashBoardController as UserDashBoardController;
 // Route::get('/', function () {
 //     return view('admin.auth.login');
 // });
+// Route for the user login to web page
+Route::get('/', [UserAuthController::class, 'register'])->name('user.register');
+
+// All Routes for the admin(role - 1) -------------------------------------------------------------
 
 Route::post('admin/login', [AuthController::class, 'login'])->name('login');
 Route::get('admin/login', [AuthController::class, 'loginGet']);
@@ -50,6 +54,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
   Route::get('/contribution-list/{id}', [MemberController::class, 'contributionListByID'])->name('contribution.listt');
   Route::post('/contribution/status', [MemberController::class, 'contributionStatus'])->name('contribution.status');
   Route::post('/proceed/payment', [MemberController::class, 'proceedPayment'])->name('proceed.payment');
+  // route for help and support
+  Route::get('/help-support', [DashboardController::class, 'helpSupport'])->name('admin.help.support');
+  Route::post('/support-settings', [DashBoardController::class, 'helpSupportStore'])->name('admin.support.settings.update');
+
 });
 
 // All routes for the leader(role - 2) -------------------------------------------------------------
@@ -84,10 +92,6 @@ Route::prefix('leader')->group(function () {
   Route::get('/contribution/list/{id}', [LeaderDashBoardController::class, 'contributionList'])->name('leader.contribution.list');
   Route::post('/contribution/status', [MemberController::class, 'contributionStatus'])->name('leader.contribution.status');
   Route::get('/logout', [MemberController::class, 'logout'])->name('leader.logout');
-
-
-
-
 
   });
 });

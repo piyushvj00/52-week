@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\HelpSupport;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -24,6 +25,7 @@ class DashBoardController extends Controller
     public function dashboard(){
         $user = Auth::user();
         $groupId = GroupMember::where('user_id',$user->id)->pluck('group_id');
+        // dd($groupId);
         $group = Group::where('id',$groupId)->first();
         $groupMembers = GroupMember::where('group_id',$groupId)->get();
         $portal = PortalSet::where('id', $group->portal_set_id)->first();
@@ -31,9 +33,12 @@ class DashBoardController extends Controller
         $contributions = Contribution::where('user_id', $user->id)->latest()->get();
         $weeklyCommitment = GroupMember::where('user_id', $user->id)->first()->weekly_commitment;
 
+        $supportDetails = HelpSupport::first();
+
         // dd($group , $portal , $contributions , $weeklyCommitment);
 
-        return view("user.dashboard", compact('user',"group" , "portal", "leader" , "groupMembers" , "contributions",'weeklyCommitment'));
+        $supportDetails = HelpSupport::first();
+        return view("user.dashboard", compact('user',"group" , "portal", "leader" , "groupMembers" , "contributions",'weeklyCommitment', 'supportDetails'));
 
     }
 

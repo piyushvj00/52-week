@@ -87,7 +87,7 @@ ease;
 
             <!-- Contribution Management -->
             <li class="nav-item">
-                <a class="d-flex align-items-center {{ request()->routeIs('user.contribution.*') ? 'active' : '' }}"
+                <a class="d-flex align-items-center {{ request()->routeIs('user.my.contribution') ? 'active' : '' }}"
                 href="{{ route('user.my.contribution') }}">
                     <div class="menu-icon-wrapper">
                         <i data-feather="dollar-sign" class="menu-icon ms-1"></i>
@@ -148,14 +148,8 @@ ease;
             </li>
 
             --}}
-            <div class="mt-4"></div>
-            <div class="mt-4"></div>
-            <div class="mt-4"></div>
-
             
-        </ul>
-                <ul class="navigation navigation-bottom">
-                    <li class="navigation-header mt-4">
+                    <li class="navigation-header mt-4 bottom-item">
                         <span class="navigation-header-text">Support</span>
                         <i data-feather="help-circle" class="navigation-header-icon"></i>
                     </li>
@@ -186,21 +180,21 @@ ease;
                         <i data-feather="mail" class="support-icon"></i>
                         <div>
                             <strong>Email Support</strong>
-                            <p>support@ekeropartners.com</p>
+                            <p>{{ $supportDetails->email ?? "Support_EkeroPartners@gmail.com" }}</p>
                         </div>
                     </div>
                     <div class="support-item">
                         <i data-feather="phone" class="support-icon"></i>
                         <div>
                             <strong>Phone Support</strong>
-                            <p>+1 (555) 123-4567</p>
+                            <p>{{ $supportDetails->phone ?? "+1234567890" }}</p>
                         </div>
                     </div>
                     <div class="support-item">
                         <i data-feather="clock" class="support-icon"></i>
                         <div>
                             <strong>Support Hours</strong>
-                            <p>Mon - Fri: 9:00 AM - 6:00 PM</p>
+                            <p>{{ $supportDetails->day ?? "EveryDay   -" }}{{ $supportDetails->time ?? "  24*7"}}</p>
                         </div>
                     </div>
                 </div>
