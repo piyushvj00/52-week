@@ -216,7 +216,7 @@
                             <div class="dropdown-header d-flex justify-content-between align-items-center">
                                 <h5 class="notification-title mb-0">Notifications</h5>
                                 @if($unreadCount > 0)
-                                    <form action="{{ route('notifications.markAllRead') }}" method="POST" class="m-0 p-0">
+                                    <form action="{{ route('user.notifications.markAllRead') }}" method="POST" class="m-0 p-0">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-outline-primary">Mark all read</button>
                                     </form>
@@ -227,7 +227,7 @@
                         <li class="scrollable-container media-list">
                             @forelse($notifications as $notif)
                                 <a class="d-flex dropdown-item notification-item {{ $notif->is_read ? '' : 'unread' }}"
-                                   href="{{ route('user.member.details', $notif->user_id) }}">
+                                   href="">
                                     <div class="me-2">
                                         <div class="avatar bg-light-primary">
                                             <i data-feather="bell" class="avatar-icon"></i>

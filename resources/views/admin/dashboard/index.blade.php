@@ -250,6 +250,48 @@
             justify-content: center;
         }
     }
+    .analytics-grid {
+        margin-bottom: 30px;
+    }
+    .analytics-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: none;
+        padding: 20px;
+        height: 100%;
+    }
+    .analytics-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 15px;
+    }
+    .analytics-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2d3748;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+    .analytics-label {
+        font-size: 0.85rem;
+        color: #718096;
+        margin-bottom: 10px;
+    }
+    .analytics-trend {
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .trend-positive {
+        color: #28c76f;
+    }
+    .trend-negative {
+        color: #ea5455;
+    }
 </style>
 @section('content')
 <div class="app-content content ">
@@ -366,7 +408,8 @@
                 </div>
             </div>
 
-          
+            <!-- Analytics Cards -->
+      
 
             <!-- Additional Charts -->
             <div class="row">
@@ -524,7 +567,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    
 document.addEventListener('DOMContentLoaded', function() {
     if (feather) {
         feather.replace({ width: 14, height: 14 });
@@ -540,81 +582,6 @@ document.addEventListener('DOMContentLoaded', function() {
         light: '#e2e8f0'
     };
 
-    // Contribution Trends Chart
-    const contributionCtx = document.getElementById('contributionTrendsChart').getContext('2d');
-    new Chart(contributionCtx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            datasets: [{
-                label: 'Contributions',
-                data: [12000, 19000, 15000, 25000, 22000, 30000, 28000, 35000, 32000, 40000, 38000, 45000],
-                borderColor: colors.primary,
-                backgroundColor: 'rgba(115, 103, 240, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        drawBorder: false
-                    },
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
-                        }
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
-            }
-        }
-    });
-
-    // Group Distribution Chart
-    const groupDistCtx = document.getElementById('groupDistributionChart').getContext('2d');
-    new Chart(groupDistCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Group A', 'Group B', 'Group C', 'Group D', 'Others'],
-            datasets: [{
-                data: [30, 25, 20, 15, 10],
-                backgroundColor: [
-                    colors.primary,
-                    colors.success,
-                    colors.warning,
-                    colors.danger,
-                    colors.info
-                ],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-
     // Monthly Performance Chart
     const monthlyCtx = document.getElementById('monthlyPerformanceChart').getContext('2d');
     new Chart(monthlyCtx, {
@@ -625,12 +592,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 label: 'Revenue',
                 data: [12000, 19000, 15000, 22000],
                 backgroundColor: colors.primary,
-                borderRadius: 8
+                borderRadius: 8,
+                barPercentage: 0.6
             }, {
                 label: 'Contributions',
                 data: [8000, 12000, 10000, 15000],
                 backgroundColor: colors.success,
-                borderRadius: 8
+                borderRadius: 8,
+                barPercentage: 0.6
             }]
         },
         options: {
@@ -638,7 +607,30 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('en-US', {
+                                    style: 'currency',
+                                    currency: 'USD'
+                                }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
                 }
             },
             scales: {
@@ -665,9 +657,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Member Status Chart
     const memberCtx = document.getElementById('memberStatusChart').getContext('2d');
     new Chart(memberCtx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
-            labels: ['Active', 'Inactive', 'Pending'],
+            labels: ['Active Members', 'Inactive Members', 'Pending Approval'],
             datasets: [{
                 data: [75, 15, 10],
                 backgroundColor: [
@@ -675,15 +667,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     colors.danger,
                     colors.warning
                 ],
-                borderWidth: 0
+                borderWidth: 0,
+                hoverOffset: 10
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '70%',
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }

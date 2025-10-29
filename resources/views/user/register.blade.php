@@ -131,7 +131,7 @@
                                     <button class="btn btn-primary w-100" type="submit" tabindex="8" id="signup-btn" disabled>Sign Up</button>
                                 </form>
 
-                                <p class="text-center mt-2"><span>Already have an account?</span><a href="auth-login-cover.html"><span>&nbsp;Sign in instead</span></a></p>
+                                <p class="text-center mt-2"><span>Already have an account?</span><a href="{{ route("user.login") }}"><span>&nbsp;Sign in instead</span></a></p>
                                 
                             </div>
                         </div>

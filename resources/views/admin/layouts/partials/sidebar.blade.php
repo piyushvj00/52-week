@@ -84,6 +84,17 @@ ease;
                     <span class="menu-badge badge bg-light-warning">Team</span>
                 </a>
             </li>
+            <!-- help and support edit -->
+            <li class="nav-item">
+                <a class="d-flex align-items-center {{ request()->routeIs('dashboard.*') ? 'active' : '' }}"
+                   href="{{ route('admin.help.support') }}">
+                    <div class="menu-icon-wrapper">
+                        <i data-feather="help-circle" class="menu-icon ms-1"></i>
+                    </div>
+                    <span class="menu-title text-truncate">Support</span>
+                    <span class="menu-badge badge bg-light-warning">Help</span>
+                </a>
+            </li>
 
             <!-- Quick Stats Section -->
             <li class="navigation-header mt-4">

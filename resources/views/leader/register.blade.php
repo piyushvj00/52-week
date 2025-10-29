@@ -154,7 +154,7 @@
                                     <button class="btn btn-primary w-100" type="submit" tabindex="8" id="signup-btn" disabled>Sign Up</button>
                                 </form>
 
-                                <p class="text-center mt-2"><span>Already have an account?</span><a href="auth-login-cover.html"><span>&nbsp;Sign in instead</span></a></p>
+                                <p class="text-center mt-2"><span>Already have an account?</span><a href="{{ route('leader.login')}}"><span>&nbsp;Sign in instead</span></a></p>
                                 
                             </div>
                         </div>
@@ -184,7 +184,7 @@ $(document).ready(function() {
         $('#send-otp').prop('disabled', true).text('Sending...');
 
         $.ajax({
-            url: "{{ route('send.otp') }}",  // backend route
+            url: "{{ route('leader.send.otp') }}",  // backend route
             type: "POST",
             data: {
                 email: email,
@@ -232,7 +232,7 @@ $(document).ready(function() {
         $(this).prop('disabled', true).text('Verifying...');
 
         $.ajax({
-            url: "{{ route('verify.otp') }}",
+            url: "{{ route('leader.verify.otp') }}",
             type: "POST",
             data: {
                 email: email,
@@ -289,7 +289,7 @@ $(document).ready(function() {
     $(this).prop('disabled', true).text('Verifying...');
 
     $.ajax({
-        url: "{{ route('verify.otp') }}",
+        url: "{{ route('leader.verify.otp') }}",
         type: "POST",
         data: {
             email: email,
