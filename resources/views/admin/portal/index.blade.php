@@ -282,10 +282,10 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="total-groups">
+                                          <a href="{{ route('groups.index') }}">  <span class="total-groups">
                                                 <i class="bi bi-people-fill"></i>
                                                 {{ $val->groups_count ?? 0 }} Groups
-                                            </span>
+                                            </span></a>
                                         </td>
                                         <td>
                                             <span class="total-groups">

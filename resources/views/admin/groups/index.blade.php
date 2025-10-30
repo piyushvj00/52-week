@@ -97,8 +97,8 @@
                                                 </td>
                                                 <td>
                                                     <div>
-                                                        <a href="{{ route('groups.edit', $val->id) }}"><img width="20px"
-                                                                src="{{ asset('admin/icons/edit.png') }}" alt=""></a>
+                                                        <!-- <a href="{{ route('groups.edit', $val->id) }}"><img width="20px"
+                                                                src="{{ asset('admin/icons/edit.png') }}" alt=""></a> -->
                                                         <form action="{{ route('groups.destroy', $val->id) }}" method="POST"
                                                             style="display:inline;"
                                                             onsubmit="return confirm('Are you sure you want to delete this groups?')">

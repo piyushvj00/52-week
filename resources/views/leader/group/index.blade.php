@@ -373,7 +373,7 @@
                                                     <div class="input-group">
                                                         <input type="text" id="inviteLink{{ $group->id }}" 
                                                                class="form-control" readonly 
-                                                               value="You are invited to invest in '{{ $group->project_name }}' as a potential investor. Click here to register: {{ route('user.register', $group->invite_link) }}">
+                                                               value=" {{ route('user.register',['link' => $group->invite_link]) }}">
                                                         <button class="btn btn-outline-primary copy-btn" 
                                                                 data-target="inviteLink{{ $group->id }}">
                                                             <i data-feather="copy"></i> Copy
@@ -385,7 +385,7 @@
                                                     <p class="small text-muted mb-2">You can also share via:</p>
                                                     <div class="d-flex gap-2">
                                                         <button class="btn btn-sm btn-outline-success share-btn" 
-                                                                data-link="{{ route('user.register', $group->invite_link) }}" 
+                                                               onclick="shareOnWhatsApp()"
                                                                 data-platform="whatsapp">
                                                             <i data-feather="message-circle"></i> WhatsApp
                                                         </button>
@@ -501,5 +501,126 @@
                 card.style.animationDelay = `${index * 0.1}s`;
             });
         });
+             function shareOnWhatsApp() {
+    const groupName = "{{ $group->name }}";
+    const inviteLink = "{{ route('user.register', ['link' => $group->invite_link]) }}";
+    
+    const message = `🌟 *Join ${groupName} Investment Group* 🌟
+
+💼 *Investment Details:*
+• Duration: 52 weeks
+• Weekly growth plan
+• Community-driven
+
+🎁 *Benefits Include:*
+✅ Financial growth
+✅ Community support  
+✅ Transparent system
+
+You're invited to invest in ${groupName}.
+
+📲 *Click to Register:*
+${inviteLink}
+
+_The link will open directly in your browser_ ✅`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappWindow = window.open(
+        `https://web.whatsapp.com/send?text=${encodedMessage}`,
+        '_blank',
+        'width=800,height=600'
+    );
+    
+    setTimeout(() => {
+        if (!whatsappWindow || whatsappWindow.closed) {
+            alert('WhatsApp Web Login Required\n\nPlease login at web.whatsapp.com first, then try sharing again.');
+            window.open('https://web.whatsapp.com', '_blank');
+        }
+    }, 1500);
+}
+function shareOnWhatsAppAdvanced() {
+    const inviteLink = "{{ route('user.register', ['link' => $group->invite_link]) }}";
+    const groupName = "{{ $group->name ?? 'Group' }}";
+    
+    const message = `Join ${groupName} for financial freedom! Share price: ${{ number_format(($group->target_amount ?? 0) / 52, 2) }}/week. Join now: ${inviteLink}`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const testWindow = window.open('https://web.whatsapp.com', 'whatsappTest', 'width=100,height=100,left=-1000,top=-1000');
+    
+    setTimeout(() => {
+        if (testWindow) {
+            try {
+                // Try to access the window location
+                if (testWindow.location.hostname === 'web.whatsapp.com') {
+                    // WhatsApp Web is accessible, close test and open share window
+                    testWindow.close();
+                    
+                    const shareWindow = window.open(
+                        `https://web.whatsapp.com/send?text=${encodedMessage}`, 
+                        'whatsappShare',
+                        'width=800,height=600'
+                    );
+                    
+                    // Check if share window opened successfully
+                    setTimeout(() => {
+                        if (!shareWindow || shareWindow.closed) {
+                            showWhatsAppLoginMessage();
+                        }
+                    }, 1000);
+                    
+                } else {
+                    testWindow.close();
+                    showWhatsAppLoginMessage();
+                }
+            } catch (e) {
+                // Cross-origin error - likely not logged in
+                testWindow.close();
+                showWhatsAppLoginMessage();
+            }
+        } else {
+            showWhatsAppLoginMessage();
+        }
+    }, 1000);
+}
+
+function showWhatsAppLoginMessage() {
+    const userResponse = confirm(
+        '⚠️ WhatsApp Web Not Accessible\n\n' +
+        'Please make sure you are logged into WhatsApp Web:\n\n' +
+        '1. Open web.whatsapp.com in your browser\n' +
+        '2. Scan the QR code with your phone\n' +
+        '3. Click OK to open WhatsApp Web for login\n\n' +
+        'Click Cancel to use mobile WhatsApp instead.'
+    );
+    
+    if (userResponse) {
+        // Open WhatsApp Web for login
+        window.open('https://web.whatsapp.com', '_blank');
+    } else {
+        // Fallback to mobile WhatsApp
+        const message = `Join {{ $group->name ?? 'Group' }}! Share: ${{ number_format(($group->target_amount ?? 0) / 52, 2) }}/week. Join: {{ route('user.register', ['link' => $group->invite_link]) }}`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+    }
+}
+
+// Simple version with immediate feedback
+function quickWhatsAppShare() {
+    const inviteLink = "{{ route('user.register', ['link' => $group->invite_link]) }}";
+    const message = `Join {{ $group->name }} for financial freedom! 🔗 ${inviteLink}`;
+    
+    const whatsappWindow = window.open(
+        `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`,
+        '_blank',
+        'width=800,height=600'
+    );
+    
+    // Quick check if window opened
+    setTimeout(() => {
+        if (!whatsappWindow || whatsappWindow.closed) {
+            alert('Please log in to WhatsApp Web first!\n\nOpen web.whatsapp.com and scan the QR code with your phone.');
+            window.open('https://web.whatsapp.com', '_blank');
+        }
+    }, 500);
+}
     </script>
 @endsection

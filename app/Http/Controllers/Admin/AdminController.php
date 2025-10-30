@@ -20,7 +20,9 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $groups = Group::with('leader')->latest()->paginate(10);
+       $portalSet = PortalSet::where('is_active', 1)->first();
+
+        $groups = Group::with('leader')->where('portal_set_id',$portalSet->id)->latest()->paginate(10);
         return view("admin.groups.index", compact("groups"));
     }
 
@@ -94,6 +96,7 @@ class AdminController extends Controller
      */
     public function edit(string $id)
     {
+        $groups = Group::find($id);
         $leader = User::where('role', 2)->where('status', 1)->latest()->get();
         $portalSets = PortalSet::where('is_active', 1)->latest()->get();
         return view('admin.groups.edit', compact('groups', 'leader', 'portalSets'));

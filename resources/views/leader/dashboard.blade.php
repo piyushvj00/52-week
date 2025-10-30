@@ -366,8 +366,7 @@
                 </div>
 
                 <!-- Additional Content -->
-                <div class="row">
-                    <!-- Recent Activity -->
+                <!-- <di    
                     <div class="col-lg-6 mb-4">
                         <div class="card recent-activity">
                             <div class="chart-card-header">
@@ -419,7 +418,6 @@
                         </div>
                     </div>
 
-                    <!-- Quick Stats -->
                     <div class="col-lg-6 mb-4">
                         <div class="card chart-card">
                             <div class="chart-card-header">
@@ -457,7 +455,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </section>
         </div>
     </div>
@@ -474,37 +472,35 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    if (feather) {
-        feather.replace({
-            width: 14,
-            height: 14
-        });
-    }
 
-    // Chart colors
-    const colors = {
-        primary: '#7367f0',
-        success: '#28c76f',
-        warning: '#ff9f43',
-        danger: '#ea5455',
-        info: '#00cfe8'
-    };
+const colors = {
+    primary: '#7367f0',
+    success: '#28c76f',
+    warning: '#ff9f43',
+    danger: '#ea5455',
+    info: '#00cfe8'
+};
 
-    // Contribution Trends Chart
-    const contributionCtx = document.getElementById('contributionTrendsChart').getContext('2d');
-    new Chart(contributionCtx, {
+// Contribution Trends Chart - Dynamic Data
+const contributionCtx = document.getElementById('contributionTrendsChart');
+if (contributionCtx) {
+    new Chart(contributionCtx.getContext('2d'), {
         type: 'line',
         data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'],
+            labels: @json($weekLabels), // Dynamic week labels
             datasets: [{
-                label: 'Contributions',
-                data: [1200, 1900, 1500, 2500, 2200, 3000, 2800],
+                label: 'Weekly Contributions',
+                data: @json($weeklyContributions), // Dynamic contribution data
                 borderColor: colors.primary,
                 backgroundColor: 'rgba(115, 103, 240, 0.1)',
                 borderWidth: 3,
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointBackgroundColor: colors.primary,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
             }]
         },
         options: {
@@ -513,6 +509,13 @@ document.addEventListener("DOMContentLoaded", function() {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Contributions: $${context.parsed.y.toLocaleString()}`;
+                        }
+                    }
                 }
             },
             scales: {
@@ -535,21 +538,28 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
     });
+}
 
-    // Member Distribution Chart
-    const memberCtx = document.getElementById('memberDistributionChart').getContext('2d');
-    new Chart(memberCtx, {
+// Member Distribution Chart - Dynamic Data
+const memberCtx = document.getElementById('memberDistributionChart');
+if (memberCtx) {
+    new Chart(memberCtx.getContext('2d'), {
         type: 'doughnut',
         data: {
-            labels: ['Active Members', 'Pending', 'Inactive'],
+            labels: ['Active Members', 'Pending Activation', 'Completed Payout'],
             datasets: [{
-                data: [75, 15, 10],
+                data: [
+                    {{ $memberDistribution['active'] ?? 0 }},
+                    {{ $memberDistribution['pending'] ?? 0 }},
+                    {{ $memberDistribution['completed'] ?? 0 }}
+                ],
                 backgroundColor: [
                     colors.success,
                     colors.warning,
-                    colors.danger
+                    colors.info
                 ],
-                borderWidth: 0
+                borderWidth: 0,
+                hoverOffset: 15
             }]
         },
         options: {
@@ -558,17 +568,93 @@ document.addEventListener("DOMContentLoaded", function() {
             cutout: '70%',
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
     });
+}
 
-    // Add animation to stat cards
-    const statCards = document.querySelectorAll('.stat-card');
-    statCards.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.1}s`;
+// Group Progress Chart (Additional chart)
+const progressCtx = document.getElementById('groupProgressChart');
+if (progressCtx) {
+    new Chart(progressCtx.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Target Progress'],
+            datasets: [{
+                label: 'Current Amount',
+                data: [{{ $contribution ?? 0 }}],
+                backgroundColor: colors.success,
+                borderRadius: 8,
+                barPercentage: 0.3
+            }, {
+                label: 'Remaining Target',
+                data: [{{ max(0, ($totalTarget ?? 0) - $contribution) }}],
+                backgroundColor: colors.light,
+                borderRadius: 8,
+                barPercentage: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: $${context.parsed.x.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                },
+                y: {
+                    stacked: true,
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
     });
+}
+
+// Add animation to stat cards
+const statCards = document.querySelectorAll('.stat-card');
+statCards.forEach((card, index) => {
+    card.style.animationDelay = `${index * 0.1}s`;
 });
 </script>
 

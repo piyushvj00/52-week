@@ -76,6 +76,7 @@ class LeaderController extends Controller
 
             $portalSet = PortalSet::where('is_active', 1)->first();
 
+
             Group::where('portal_set_id', $portalSet->id)
                 ->whereBetween('group_number', [6, 52])
                 ->decrement('group_number');
@@ -121,12 +122,16 @@ class LeaderController extends Controller
                 'invite_link' => $inviteLink,
                 'is_active' => true
             ]);
-              $this->createNotification(
+            $this->createNotification(
                 $request->name . " registered successfully",
                 $user->id,
                 auth()->user()->id
             );
-
+            $checkGroupCount = Group::where('portal_set_id', $portalSet->id)->count();
+            if ($checkGroupCount == 52) {
+                $portalSet->is_active = 0;
+                $portalSet->save();
+            }
             DB::commit();
             return redirect()->route('leader.index')->with('success', 'Add Leader successfully');
         } catch (\Throwable $th) {

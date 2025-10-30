@@ -18,9 +18,20 @@ use Illuminate\Support\Facades\Session;
 class AuthController extends Controller
 {
 
-    public function register($ref = null)
+    public function register(Request $request)
     {
-        $link = $ref;
+        $key = array_key_first($request->all());
+        $invite_link = Group::find($key);
+        $link = null;
+  if ($invite_link) {
+      $link =  $invite_link->invite_link;
+    # code...
+  }
+        
+        if ($request['link']) {
+            $group = Group::where('invite_link',$request['link'])->first();
+            return view('user.compney-data',compact('group'));
+        }
         return view("user.register", compact('link'));
     }
 
