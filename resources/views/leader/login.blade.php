@@ -100,13 +100,10 @@
                                     </div>
                                     <button class="btn btn-primary w-100" tabindex="4">Sign in</button>
                                 </form>
-                                <!-- <p class="text-center mt-2"><span>New on our platform?</span><a href="auth-register-cover.html"><span>&nbsp;Create an account</span></a></p>
-                                <div class="divider my-2">
-                                    <div class="divider-text">or</div>
-                                </div> -->
+                                <p class="text-center mt-2"><span>New on our platform?</span><a href="{{ route('leader.register') }}"><span>&nbsp;Register</span></a></p>
+                                
                             </div>
                         </div>
-                        <!-- /Login-->
                     </div>
                 </div>
             </div>

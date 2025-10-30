@@ -157,6 +157,34 @@ class DashBoardController extends Controller
         ));
     }
 
+    public function getContributionTrends()
+{
+    $userId = Auth::id();
+
+    // Example: get monthly total or weekly contribution trends
+    $contributions = Contribution::where('user_id', $userId)
+        ->selectRaw('MONTH(paid_date) as month, SUM(amount) as total')
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+    // Format data for Chart.js
+    $labels = [];
+    $data = [];
+
+    foreach ($contributions as $row) {
+        $labels[] = date("M", mktime(0, 0, 0, $row->month, 1)); // e.g., Jan, Feb
+        $data[] = $row->total;
+    }
+    dd($data, $labels);
+
+    return response()->json([
+        'labels' => $labels,
+        'data' => $data
+    ]);
+}
+
+
         
     
 
