@@ -136,18 +136,18 @@
                                         <i data-feather="user" class="font-medium-3 me-50"></i>
                                         <span class="fw-bold">Account</span></a>
                                 </li>
-                                <li class="nav-item">
+                                <!-- <li class="nav-item">
                                     <a class="nav-link" href="app-user-view-security.html">
                                         <i data-feather="lock" class="font-medium-3 me-50"></i>
                                         <span class="fw-bold">Contribution</span>
                                     </a>
-                                </li>
-                                <li class="nav-item">
+                                </li> -->
+                                <!-- <li class="nav-item">
                                     <a class="nav-link" href="app-user-view-billing.html">
                                         <i data-feather="bookmark" class="font-medium-3 me-50"></i>
                                         <span class="fw-bold">Payouts</span>
                                     </a>
-                                </li>
+                                </li> -->
                                 
                             </ul>
                             <!--/ User Pills -->
