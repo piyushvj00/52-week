@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Models\Group;
 use App\Models\GroupMember;
+use App\Models\PortalSet;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -23,14 +24,14 @@ class AuthController extends Controller
         $key = array_key_first($request->all());
         $invite_link = Group::find($key);
         $link = null;
-  if ($invite_link) {
-      $link =  $invite_link->invite_link;
-    # code...
-  }
-        
+        if ($invite_link) {
+            $link = $invite_link->invite_link;
+        }
+
         if ($request['link']) {
-            $group = Group::where('invite_link',$request['link'])->first();
-            return view('user.compney-data',compact('group'));
+            $group = Group::where('invite_link', $request['link'])->first();
+            $portalSet = PortalSet::find($group->portal_set_id);
+            return view('user.compney-data', compact('group','portalSet'));
         }
         return view("user.register", compact('link'));
     }
@@ -61,7 +62,7 @@ class AuthController extends Controller
                 $user->id,
                 $group->leader_id
             );
-            
+
             DB::commit();
             return redirect()->route('user.login')->with('success', 'Registration successful. Please login.');
         } catch (\Throwable $th) {
@@ -106,9 +107,9 @@ class AuthController extends Controller
         // Store OTP in session (or database)
         Session::put('otp_for_' . $request->email, $emailOtp);
         Session::put('otp_expires_' . $request->email, now()->addMinutes(5));
- 
+
         Mail::to($request->email)->send(new OtpEmail($emailOtp));
- 
+
 
         return response()->json(['message' => 'OTP sent to your email address!']);
     }
@@ -180,22 +181,24 @@ class AuthController extends Controller
 
     }
 
-    public function forgetPass(){
+    public function forgetPass()
+    {
         return view("user.forgetpass");
     }
 
-    public function forgetPassStore(Request $request) {
+    public function forgetPassStore(Request $request)
+    {
         $request->validate([
-            "email"=> "required|email",
-            "password"=> "required|min:6",
+            "email" => "required|email",
+            "password" => "required|min:6",
         ]);
         $user = User::where("email", $request->email)->first();
-        if(!$user){
+        if (!$user) {
             return redirect()->route("user.register")->with("User Don't Exist ! Please Register First");
         }
         $user->password = Hash::make($request->password);
         $user->save();
-        return redirect()->route('user.login')->with('success','PassWord Updated. Please login.');    
+        return redirect()->route('user.login')->with('success', 'PassWord Updated. Please login.');
     }
 
 

@@ -292,29 +292,6 @@
                 <div class="group-card-extra text-end">
                 </div>
 
-<<<<<<< HEAD
-                @if($groups->project_name)
-                    <p class="group-card-subtitle mb-0">{{ $groups->project_name }}</p>
-                @endif
-            </div>
-            
-            <div class="group-card-body">
-                <!-- Progress Section -->
-                <div class="progress-container">
-                    <div class="progress-info">
-                        <span class="info-label">Progress</span>
-                        <span class="info-value">
-                            @if($groups->target_amount > 0)
-                                {{ number_format(($groups->current_amount / $groups->target_amount) * 100, 1) }}%
-                            @else
-                                0%
-                            @endif
-                        </span>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-bar" 
-                             style="width: {{ $groups->target_amount > 0 ? ($groups->current_amount / $groups->target_amount) * 100 : 0 }}%">
-=======
                                     <div class="group-card-footer">
                                         <a href="{{ route('leader.groups.member', $group->id) }}" 
                                            class="btn-action btn-view">
@@ -377,7 +354,6 @@
                                     </div>
                                 </div>
                             @endforeach
->>>>>>> c51930642c02e0af71842b67559a9b617d0c5b61
                         </div>
                     </div>
                     <div class="progress-info mt-2">
@@ -387,94 +363,102 @@
                     </div>
                 </div>
 
-                <!-- Group Information -->
-                <div class="group-info-list">
-                    <div class="group-info-item">
-                        <span class="info-label">Leader</span>
-                        <span class="info-value">{{ $groups->leader->name ?? 'Not Assigned' }}</span>
-                    </div>
-                    <div class="group-info-item">
-                        <span class="info-label">Target Amount</span>
-                        <span class="info-value">${{ number_format($groups->target_amount, 2) }}</span>
-                    </div>
-                    <div class="group-info-item">
-                        <span class="info-label">Status</span>
-                        <span class="status-badge {{ $groups->is_active ? 'status-active' : 'status-inactive' }}">
-                            {{ $groups->is_active ? 'Active' : 'Inactive' }}
-                        </span>
-                    </div>
-                    <div class="group-info-item">
-                        <span class="info-label">Duration</span>
-                        <span class="info-value">
-                            {{ date('M d, Y', strtotime($groups->start_date)) }} - 
-                            {{ date('M d, Y', strtotime($groups->end_date)) }}
-                        </span>
-                    </div>
-                </div>
-            </div>
+                                        <!-- Group Information -->
+                                        <div class="group-info-list">
+                                            <div class="group-info-item">
+                                                <span class="info-label">Leader</span>
+                                                <span class="info-value">{{ $groups->leader->name ?? 'Not Assigned' }}</span>
+                                            </div>
+                                            <div class="group-info-item">
+                                                <span class="info-label">Target Amount</span>
+                                                <span class="info-value">${{ number_format($groups->target_amount, 2) }}</span>
+                                            </div>
+                                            <div class="group-info-item">
+                                                <span class="info-label">Status</span>
+                                                <span class="status-badge {{ $groups->is_active ? 'status-active' : 'status-inactive' }}">
+                                                    {{ $groups->is_active ? 'Active' : 'Inactive' }}
+                                                </span>
+                                            </div>
+                                            <div class="group-info-item">
+                                                <span class="info-label">Duration</span>
+                                                <span class="info-value">
+                                                    {{ date('M d, Y', strtotime($groups->start_date)) }} - 
+                                                    {{ date('M d, Y', strtotime($groups->end_date)) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
 
-            <div class="group-card-footer">
-                <a href="{{ route('leader.groups.member', $groups->id) }}" class="btn-action btn-view">
-                    <i data-feather="users"></i> Members
-                </a>
-                <a href="{{ route('leader.groups.edit', $groups->id) }}" class="btn-action btn-edit">
-                    <i data-feather="edit"></i> Edit
-                </a>
-                <button class="btn-action btn-invite" data-bs-toggle="modal" data-bs-target="#inviteModal{{ $groups->id }}">
-                    <i data-feather="user-plus"></i> Invite
-                </button>
-            </div>
-        </div>
+                                    <div class="group-card-footer">
+                                        <a href="{{ route('leader.groups.member', $groups->id) }}" 
+                                           class="btn-action btn-view">
+                                            <i data-feather="users"></i> Members
+                                        </a>
+                                        <a href="{{ route('leader.groups.edit', $groups->id) }}" 
+                                           class="btn-action btn-edit">
+                                            <i data-feather="edit"></i> Edit
+                                        </a>
+                                        <button class="btn-action btn-invite" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#inviteModal{{ $groups->id }}">
+                                            <i data-feather="user-plus"></i> Invite
+                                        </button>
+                                    </div>
+                                </div>
 
-        <!-- Invite Modal -->
-        <div class="modal fade" id="inviteModal{{ $groups->id }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Invite Member to {{ $groups->name }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Share this invitation link with new members to join your group:</p>
-                        <div class="invite-link-container">
-                            <div class="input-group">
-                                <input type="text" id="inviteLink{{ $groups->id }}" class="form-control" readonly 
-                                    value="You are invited to invest in '{{ $groups->project_name }}' as a potential investor. Click here to register: {{ route('user.register', $groups->invite_link) }}">
-                                <button class="btn btn-outline-primary copy-btn" data-target="inviteLink{{ $groups->id }}">
-                                    <i data-feather="copy"></i> Copy
-                                </button>
-                            </div>
-                            <small class="text-success mt-2 d-none copied-msg">Copied to clipboard!</small>
+                                <!-- Invite Modal for each group -->
+                                <div class="modal fade" id="inviteModal{{ $groups->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Invite Member to {{ $groups->name }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Share this invitation link with new members to join your group:</p>
+                                                <div class="invite-link-container">
+                                                    <div class="input-group">
+                                                        <input type="text" id="inviteLink{{ $groups->id }}" 
+                                                               class="form-control" readonly 
+                                                               value=" {{ route('user.register',['link' => $groups->invite_link]) }}">
+                                                        <button class="btn btn-outline-primary copy-btn" 
+                                                                data-target="inviteLink{{ $groups->id }}">
+                                                            <i data-feather="copy"></i> Copy
+                                                        </button>
+                                                    </div>
+                                                    <small class="text-success mt-2 d-none copied-msg">Copied to clipboard!</small>
+                                                </div>
+                                                <div class="mt-3">
+                                                    <p class="small text-muted mb-2">You can also share via:</p>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm btn-outline-success share-btn" 
+                                                               onclick="shareOnWhatsApp()"
+                                                                data-platform="whatsapp">
+                                                            <i data-feather="message-circle"></i> WhatsApp
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                         </div>
-                        <div class="mt-3">
-                            <p class="small text-muted mb-2">You can also share via:</p>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-success share-btn" 
-                                        data-link="{{ route('user.register', $groups->invite_link) }}" 
-                                        data-platform="whatsapp">
-                                    <i data-feather="message-circle"></i> WhatsApp
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-@else
-    <div class="empty-state">
-        <i data-feather="users"></i>
-        <h4>No Group Found</h4>
-        <p>You are not currently managing any group.</p>
-        <a href="{{ Route('leader.groups.create') }}" class="btn btn-primary mt-2">
-            <i data-feather="plus" class="me-1"></i> Create Your First Group
-        </a>
-    </div>
-@endif
 
+                        <!-- Pagination -->
+                       
+                    @else
+                        <div class="empty-state">
+                            <i data-feather="users"></i>
+                            <h4>No Groups Found</h4>
+                            <p>You are not currently managing any groups.</p>
+                            <a href="{{ Route('leader.groups.create') }}" class="btn btn-primary mt-2">
+                                <i data-feather="plus" class="me-1"></i> Create Your First Group
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -548,8 +532,8 @@
             });
         });
              function shareOnWhatsApp() {
-    const groupName = "{{ $group->name }}";
-    const inviteLink = "{{ route('user.register', ['link' => $group->invite_link]) }}";
+    const groupName = "{{ $groups->name }}";
+    const inviteLink = "{{ route('user.register', ['link' => $groups->invite_link]) }}";
     
     const message = `🌟 *Join ${groupName} Investment Group* 🌟
 
@@ -585,8 +569,8 @@ _The link will open directly in your browser_ ✅`;
     }, 1500);
 }
 function shareOnWhatsAppAdvanced() {
-    const inviteLink = "{{ route('user.register', ['link' => $group->invite_link]) }}";
-    const groupName = "{{ $group->name ?? 'Group' }}";
+    const inviteLink = "{{ route('user.register', ['link' => $groups->invite_link]) }}";
+    const groupName = "{{ $groups->name ?? 'Group' }}";
     
     const message = `Join ${groupName} for financial freedom! Share price: ${{ number_format(($group->target_amount ?? 0) / 52, 2) }}/week. Join now: ${inviteLink}`;
     
@@ -644,15 +628,15 @@ function showWhatsAppLoginMessage() {
         window.open('https://web.whatsapp.com', '_blank');
     } else {
         // Fallback to mobile WhatsApp
-        const message = `Join {{ $group->name ?? 'Group' }}! Share: ${{ number_format(($group->target_amount ?? 0) / 52, 2) }}/week. Join: {{ route('user.register', ['link' => $group->invite_link]) }}`;
+        const message = `Join {{ $groups->name ?? 'Group' }}! Share: ${{ number_format(($groups->target_amount ?? 0) / 52, 2) }}/week. Join: {{ route('user.register', ['link' => $groups->invite_link]) }}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
     }
 }
 
 // Simple version with immediate feedback
 function quickWhatsAppShare() {
-    const inviteLink = "{{ route('user.register', ['link' => $group->invite_link]) }}";
-    const message = `Join {{ $group->name }} for financial freedom! 🔗 ${inviteLink}`;
+    const inviteLink = "{{ route('user.register', ['link' => $groups->invite_link]) }}";
+    const message = `Join {{ $groups->name }} for financial freedom! 🔗 ${inviteLink}`;
     
     const whatsappWindow = window.open(
         `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`,
