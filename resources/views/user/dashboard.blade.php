@@ -453,7 +453,11 @@
                                     <div class="activity-content">
                                         <div class="activity-title">Contribution Made</div>
                                         <div class="activity-description">Weekly payment submitted successfully</div>
-                                        <div class="activity-time">2 hours ago</div>
+                                        @if( count( $contributions)>0)
+                                            <div class="activity-time">{{ \Carbon\Carbon::parse($contributions[0]->created_at)->diffForHumans()}}</div>
+                                        @else
+                                            <div class="activity-time">Not Contributed</div>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="activity-item">
@@ -462,8 +466,12 @@
                                     </div>
                                     <div class="activity-content">
                                         <div class="activity-title">New Member</div>
-                                        <div class="activity-description">A new member joined the group</div>
-                                        <div class="activity-time">1 day ago</div>
+                                        <div class="activity-description">A new member name {{  $groupMembers[0]->name}} joined the group</div>
+                                        @if( count( $groupMembers)>0)
+                                            <div class="activity-time">{{ \Carbon\Carbon::parse($groupMembers[0]->created_at)->diffForHumans()}}</div>
+                                        @else
+                                            <div class="activity-time text-danger">No Data Available</div>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="activity-item">
@@ -476,16 +484,7 @@
                                         <div class="activity-time">2 days ago</div>
                                     </div>
                                 </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon bg-light-info">
-                                        <i data-feather="award" class="text-info"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Achievement</div>
-                                        <div class="activity-description">Perfect attendance this month</div>
-                                        <div class="activity-time">3 days ago</div>
-                                    </div>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -499,22 +498,25 @@
                             </div>
                             <div class="card-body">
                                 <div class="row text-center">
+                                    
+                                        <div class="col-6 mb-4">
+                                            <div class="stat-value text-success">{{ $weeklyCommitment }}</div>
+                                            <div class="stat-label">Your Weekly Commitment</div>
+                                        </div>
+                                    
                                     <div class="col-6 mb-4">
-                                        <div class="stat-value text-primary">95%</div>
-                                        <div class="stat-label">On-time Payments</div>
+                                        <div class="stat-value text-warning">${{ $userContribution??0.00 }}</div>
+                                        <div class="stat-label">You Contributed</div>
                                     </div>
                                     <div class="col-6 mb-4">
-                                        <div class="stat-value text-success">100%</div>
-                                        <div class="stat-label">Weeks Active</div>
+                                        <div class="stat-value text-warning">${{  }}</div>
+                                        <div class="stat-label">Group's Week Target</div>
                                     </div>
                                     <div class="col-6 mb-4">
-                                        <div class="stat-value text-warning">${{ number_format($group->current_amount ?? 0, 0) }}</div>
-                                        <div class="stat-label">Total Contributed</div>
+                                        <div class="stat-value text-warning">${{ $groupContribution??0.00 }}</div>
+                                        <div class="stat-label">Group Contributed</div>
                                     </div>
-                                    <div class="col-6 mb-4">
-                                        <div class="stat-value text-info">{{ $weekNumber }}/{{ $totalWeeks }}</div>
-                                        <div class="stat-label">Weeks Completed</div>
-                                    </div>
+                                    
                                 </div>
                                 <div class="mt-4">
                                     <div class="d-flex justify-content-between align-items-center mb-2">

@@ -210,7 +210,7 @@
                 <div class="col-md-8">
                     <div class="card dashboard-card">
                         <div class="card-header-custom">
-                            <h4 class="card-title text-white mb-0">Quick Payment</h4>
+                            <h4 class="card-title text-white mb-0">Quick Review</h4>
                         </div>
                         <div class="card-body">
                             <div class="row align-items-center">
@@ -224,20 +224,22 @@
                                         <div class="info-value">Week {{ $currentWeek }}</div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 text-center">
-                                    <form action="{{ route('user.my.contribution.pay')}}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="group_id" value="{{$group->id}}">
-                                        <input type="hidden" name="user_id" value="{{$user->id}}">
-                                        <input type="hidden" name="amount" value="123">
-                                        <input type="hidden" name="transaction_id" value="1123456">
-                                        <input type="hidden" name="week_number" value="{{ $currentWeek }}">
-                                        <button type="submit" class="pay-button text-white">
-                                            <i class="bi bi-credit-card me-2"></i>Pay Now
-                                        </button>
-                                    </form>
-                                    <small class="text-muted mt-2 d-block">Make your weekly contribution</small>
-                                </div>
+                                  {{--  
+                                    <div class="col-md-6 text-center">
+                                        <form action="{{ route('user.my.contribution.pay')}}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="group_id" value="{{$group->id}}">
+                                            <input type="hidden" name="user_id" value="{{$user->id}}">
+                                            <input type="hidden" name="amount" value="123">
+                                            <input type="hidden" name="transaction_id" value="1123456">
+                                            <input type="hidden" name="week_number" value="{{ $currentWeek }}">
+                                            <button type="submit" class="pay-button text-white">
+                                                <i class="bi bi-credit-card me-2"></i>Pay Now
+                                            </button>
+                                        </form>
+                                        <small class="text-muted mt-2 d-block">Make your weekly contribution</small>
+                                    </div>
+                                   --}} 
                             </div>
                         </div>
                     </div>

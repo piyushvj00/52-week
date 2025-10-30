@@ -98,9 +98,10 @@ class DashBoardController extends Controller
 }
     public function group()
     {
-        $groups = Group::where('leader_id', auth()->user()->id)->latest()->paginate(10);
+        $groups = Group::where('leader_id', auth()->user()->id)->first(); 
         $member = User::where('role', 3)->latest()->get();
-        return view('leader.group.index', compact('groups', 'member'));
+        $portalSet = PortalSet::where('id', $groups->portal_set_id )->first();
+        return view('leader.group.index', compact('groups', 'member','portalSet'));
     }
     public function groupCreate()
     {
@@ -218,7 +219,7 @@ class DashBoardController extends Controller
         $group->project_description = $request->project_description;
         $group->project_name = $request->project_name;
         $group->save();
-        return redirect()->back()->with('success', 'Group Updated successsfully');
+        return redirect()->route('leader.group')->with('success', 'Group Updated successsfully');
 
 
     }

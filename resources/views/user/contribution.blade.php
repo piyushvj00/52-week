@@ -76,7 +76,11 @@
                                     <div class="info-content">
                                         <div class="info-item">
                                             <span class="info-label">Leader Name:</span>
-                                            <span class="info-value">{{ $leader->name }}</span>
+                                            <span class="info-value">{{ $leader->name??"Not Provided" }}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Leader Email:</span>
+                                            <span class="info-value">{{ $leader->email??"Not Provided" }}</span>
                                         </div>
                                     </div>
                                 </div>
