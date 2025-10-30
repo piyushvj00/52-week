@@ -18,18 +18,84 @@ class DashBoardController extends Controller
 
     public function dashboard()
     {
-        $portalSet = PortalSet::where('is_active',1)->first();
-        $group = Group::where('leader_id',auth()->user()->id)->first();
-        if(!$group){
-            $groupMember = 0;
-            $contribution = 0;
-            return view("leader.dashboard",compact('portalSet','contribution','groupMember'));
-        }
-        $groupMember = GroupMember::where('group_id',$group->id)->count() ?? 0;
-        $contribution = Contribution::whereIn('group_id',$group)->sum('amount') ?? 0;
- 
-        return view("leader.dashboard",compact('portalSet','contribution','groupMember'));
+    $portalSet = PortalSet::where('is_active', 1)->first();
+    $group = Group::where('leader_id', auth()->user()->id)->first();
+    
+    if (!$group) {
+        $groupMember = 0;
+        $contribution = 0;
+        $weeklyContributions = [];
+        $memberDistribution = [];
+        $weekLabels = [];
+        
+        return view("leader.dashboard", compact(
+            'portalSet', 
+            'contribution', 
+            'groupMember',
+            'weeklyContributions',
+            'memberDistribution',
+            'weekLabels'
+        ));
     }
+
+    $groupMember = GroupMember::where('group_id', $group->id)->count() ?? 0;
+    $contribution = Contribution::where('group_id', $group->id)->sum('amount') ?? 0;
+
+    // Contribution Trends Data (Last 7 weeks)
+    $weeklyContributions = [];
+    $weekLabels = [];
+    
+    for ($i = 6; $i >= 0; $i--) {
+        $weekStart = now()->subWeeks($i)->startOfWeek();
+        $weekEnd = now()->subWeeks($i)->endOfWeek();
+        $weekNumber = now()->subWeeks($i)->week;
+        
+        $weekContribution = Contribution::where('group_id', $group->id)
+            ->where('status', 'completed')
+            ->whereBetween('contribution_date', [$weekStart, $weekEnd])
+            ->sum('amount');
+        
+        $weeklyContributions[] = (float) $weekContribution;
+        $weekLabels[] = 'Week ' . $weekNumber;
+    }
+
+    // Member Distribution Data
+    $activeMembers = GroupMember::where('group_id', $group->id)
+        ->where('is_active', true)
+        ->count();
+
+    $pendingMembers = GroupMember::where('group_id', $group->id)
+        ->where('is_active', false)
+        ->count();
+
+    $completedMembers = GroupMember::where('group_id', $group->id)
+        ->where('has_recived', true)
+        ->count();
+
+    $memberDistribution = [
+        'active' => $activeMembers,
+        'pending' => $pendingMembers,
+        'completed' => $completedMembers
+    ];
+
+    // Additional stats for the dashboard
+    $totalTarget = $group->target_amount;
+    $completionPercentage = $totalTarget > 0 ? ($contribution / $totalTarget) * 100 : 0;
+    $weeksRemaining = $portalSet ? now()->diffInWeeks($portalSet->end_date) : 0;
+
+    return view("leader.dashboard", compact(
+        'portalSet', 
+        'contribution', 
+        'groupMember',
+        'group',
+        'weeklyContributions',
+        'memberDistribution',
+        'weekLabels',
+        'totalTarget',
+        'completionPercentage',
+        'weeksRemaining'
+    ));
+}
     public function group()
     {
         $groups = Group::where('leader_id', auth()->user()->id)->first(); 

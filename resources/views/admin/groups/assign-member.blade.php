@@ -49,7 +49,7 @@
                                             <th>Number</th>
                                             <th>Email</th>
                                             <th>Weekly Contribution</th>
-                                            <th>Action</th>
+                                            <!-- <th>Action</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -64,9 +64,9 @@
                                                 </td>
                                                 <td>
                                                     <!-- Payout Button -->
-                                                    <button type="button" class="btn btn-{{ $val->has_recived != 1 ? 'success' : 'secondary' }}" @if($val->has_recived != 1) data-bs-toggle="modal" data-bs-target="#payoutModal{{ $val->id }}" @endif>
+                                                    <!-- <button type="button" class="btn btn-{{ $val->has_recived != 1 ? 'success' : 'secondary' }}" @if($val->has_recived != 1) data-bs-toggle="modal" data-bs-target="#payoutModal{{ $val->id }}" @endif>
     Payout
-</button>
+</button> -->
 
 <!-- Payout Modal -->
 <div class="modal fade" id="payoutModal{{ $val->id }}" tabindex="-1" aria-labelledby="payoutModalLabel{{ $val->id }}" aria-hidden="true">

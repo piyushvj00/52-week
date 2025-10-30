@@ -292,27 +292,68 @@
                 <div class="group-card-extra text-end">
                 </div>
 
-                @if($groups->project_name)
-                    <p class="group-card-subtitle mb-0">{{ $groups->project_name }}</p>
-                @endif
-            </div>
-            
-            <div class="group-card-body">
-                <!-- Progress Section -->
-                <div class="progress-container">
-                    <div class="progress-info">
-                        <span class="info-label">Progress</span>
-                        <span class="info-value">
-                            @if($groups->target_amount > 0)
-                                {{ number_format(($groups->current_amount / $groups->target_amount) * 100, 1) }}%
-                            @else
-                                0%
-                            @endif
-                        </span>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-bar" 
-                             style="width: {{ $groups->target_amount > 0 ? ($groups->current_amount / $groups->target_amount) * 100 : 0 }}%">
+                                    <div class="group-card-footer">
+                                        <a href="{{ route('leader.groups.member', $group->id) }}" 
+                                           class="btn-action btn-view">
+                                            <i data-feather="users"></i> Members
+                                        </a>
+                                        <a href="{{ route('leader.groups.edit', $group->id) }}" 
+                                           class="btn-action btn-edit">
+                                            <i data-feather="edit"></i> Edit
+                                        </a>
+                                        <button class="btn-action btn-invite" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#inviteModal{{ $group->id }}">
+                                            <i data-feather="user-plus"></i> Invite
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Invite Modal for each group -->
+                                <div class="modal fade" id="inviteModal{{ $group->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Invite Member to {{ $group->name }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Share this invitation link with new members to join your group:</p>
+                                                <div class="invite-link-container">
+                                                    <div class="input-group">
+                                                        <input type="text" id="inviteLink{{ $group->id }}" 
+                                                               class="form-control" readonly 
+                                                               value=" {{ route('user.register',['link' => $group->invite_link]) }}">
+                                                        <button class="btn btn-outline-primary copy-btn" 
+                                                                data-target="inviteLink{{ $group->id }}">
+                                                            <i data-feather="copy"></i> Copy
+                                                        </button>
+                                                    </div>
+                                                    <small class="text-success mt-2 d-none copied-msg">Copied to clipboard!</small>
+                                                </div>
+                                                <div class="mt-3">
+                                                    <p class="small text-muted mb-2">You can also share via:</p>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm btn-outline-success share-btn" 
+                                                               onclick="shareOnWhatsApp()"
+                                                                data-platform="whatsapp">
+                                                            <i data-feather="message-circle"></i> WhatsApp
+                                                        </button>
+                                                        <!-- <button class="btn btn-sm btn-outline-primary share-btn" 
+                                                                data-link="{{ route('user.register', $group->invite_link) }}" 
+                                                                data-platform="email">
+                                                            <i data-feather="mail"></i> Email
+                                                        </button> -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                     <div class="progress-info mt-2">
@@ -482,5 +523,126 @@
                 card.style.animationDelay = `${index * 0.1}s`;
             });
         });
+             function shareOnWhatsApp() {
+    const groupName = "{{ $group->name }}";
+    const inviteLink = "{{ route('user.register', ['link' => $group->invite_link]) }}";
+    
+    const message = `🌟 *Join ${groupName} Investment Group* 🌟
+
+💼 *Investment Details:*
+• Duration: 52 weeks
+• Weekly growth plan
+• Community-driven
+
+🎁 *Benefits Include:*
+✅ Financial growth
+✅ Community support  
+✅ Transparent system
+
+You're invited to invest in ${groupName}.
+
+📲 *Click to Register:*
+${inviteLink}
+
+_The link will open directly in your browser_ ✅`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappWindow = window.open(
+        `https://web.whatsapp.com/send?text=${encodedMessage}`,
+        '_blank',
+        'width=800,height=600'
+    );
+    
+    setTimeout(() => {
+        if (!whatsappWindow || whatsappWindow.closed) {
+            alert('WhatsApp Web Login Required\n\nPlease login at web.whatsapp.com first, then try sharing again.');
+            window.open('https://web.whatsapp.com', '_blank');
+        }
+    }, 1500);
+}
+function shareOnWhatsAppAdvanced() {
+    const inviteLink = "{{ route('user.register', ['link' => $group->invite_link]) }}";
+    const groupName = "{{ $group->name ?? 'Group' }}";
+    
+    const message = `Join ${groupName} for financial freedom! Share price: ${{ number_format(($group->target_amount ?? 0) / 52, 2) }}/week. Join now: ${inviteLink}`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const testWindow = window.open('https://web.whatsapp.com', 'whatsappTest', 'width=100,height=100,left=-1000,top=-1000');
+    
+    setTimeout(() => {
+        if (testWindow) {
+            try {
+                // Try to access the window location
+                if (testWindow.location.hostname === 'web.whatsapp.com') {
+                    // WhatsApp Web is accessible, close test and open share window
+                    testWindow.close();
+                    
+                    const shareWindow = window.open(
+                        `https://web.whatsapp.com/send?text=${encodedMessage}`, 
+                        'whatsappShare',
+                        'width=800,height=600'
+                    );
+                    
+                    // Check if share window opened successfully
+                    setTimeout(() => {
+                        if (!shareWindow || shareWindow.closed) {
+                            showWhatsAppLoginMessage();
+                        }
+                    }, 1000);
+                    
+                } else {
+                    testWindow.close();
+                    showWhatsAppLoginMessage();
+                }
+            } catch (e) {
+                // Cross-origin error - likely not logged in
+                testWindow.close();
+                showWhatsAppLoginMessage();
+            }
+        } else {
+            showWhatsAppLoginMessage();
+        }
+    }, 1000);
+}
+
+function showWhatsAppLoginMessage() {
+    const userResponse = confirm(
+        '⚠️ WhatsApp Web Not Accessible\n\n' +
+        'Please make sure you are logged into WhatsApp Web:\n\n' +
+        '1. Open web.whatsapp.com in your browser\n' +
+        '2. Scan the QR code with your phone\n' +
+        '3. Click OK to open WhatsApp Web for login\n\n' +
+        'Click Cancel to use mobile WhatsApp instead.'
+    );
+    
+    if (userResponse) {
+        // Open WhatsApp Web for login
+        window.open('https://web.whatsapp.com', '_blank');
+    } else {
+        // Fallback to mobile WhatsApp
+        const message = `Join {{ $group->name ?? 'Group' }}! Share: ${{ number_format(($group->target_amount ?? 0) / 52, 2) }}/week. Join: {{ route('user.register', ['link' => $group->invite_link]) }}`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+    }
+}
+
+// Simple version with immediate feedback
+function quickWhatsAppShare() {
+    const inviteLink = "{{ route('user.register', ['link' => $group->invite_link]) }}";
+    const message = `Join {{ $group->name }} for financial freedom! 🔗 ${inviteLink}`;
+    
+    const whatsappWindow = window.open(
+        `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`,
+        '_blank',
+        'width=800,height=600'
+    );
+    
+    // Quick check if window opened
+    setTimeout(() => {
+        if (!whatsappWindow || whatsappWindow.closed) {
+            alert('Please log in to WhatsApp Web first!\n\nOpen web.whatsapp.com and scan the QR code with your phone.');
+            window.open('https://web.whatsapp.com', '_blank');
+        }
+    }, 500);
+}
     </script>
 @endsection
