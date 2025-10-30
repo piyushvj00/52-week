@@ -99,6 +99,7 @@ class DashBoardController extends Controller
     public function group()
     {
         $groups = Group::where('leader_id', auth()->user()->id)->first(); 
+        // dd($groups);
         $member = User::where('role', 3)->latest()->get();
         $portalSet = PortalSet::where('id', $groups->portal_set_id )->first();
         return view('leader.group.index', compact('groups', 'member','portalSet'));

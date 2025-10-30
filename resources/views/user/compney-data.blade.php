@@ -88,7 +88,7 @@
                             <span class="text-blue-100 text-lg font-semibold">Share Price</span>
                         </div>
                         <div class="text-4xl font-bold text-white mb-2">
-                            ${{ number_format($group->target_amount / 52, 2) }}
+                            ${{ number_format($portalSet->share_price ?? 0) }}
                         </div>
                         <p class="text-blue-200 text-sm">Per share per week</p>
                     </div>
