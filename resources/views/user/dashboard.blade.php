@@ -509,7 +509,7 @@
                                         <div class="stat-label">You Contributed</div>
                                     </div>
                                     <div class="col-6 mb-4">
-                                        <div class="stat-value text-warning">${{  }}</div>
+                                        <div class="stat-value text-warning">${{ $portal->target_amount }}</div>
                                         <div class="stat-label">Group's Week Target</div>
                                     </div>
                                     <div class="col-6 mb-4">

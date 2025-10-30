@@ -292,6 +292,29 @@
                 <div class="group-card-extra text-end">
                 </div>
 
+<<<<<<< HEAD
+                @if($groups->project_name)
+                    <p class="group-card-subtitle mb-0">{{ $groups->project_name }}</p>
+                @endif
+            </div>
+            
+            <div class="group-card-body">
+                <!-- Progress Section -->
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="info-label">Progress</span>
+                        <span class="info-value">
+                            @if($groups->target_amount > 0)
+                                {{ number_format(($groups->current_amount / $groups->target_amount) * 100, 1) }}%
+                            @else
+                                0%
+                            @endif
+                        </span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" 
+                             style="width: {{ $groups->target_amount > 0 ? ($groups->current_amount / $groups->target_amount) * 100 : 0 }}%">
+=======
                                     <div class="group-card-footer">
                                         <a href="{{ route('leader.groups.member', $group->id) }}" 
                                            class="btn-action btn-view">
@@ -354,6 +377,7 @@
                                     </div>
                                 </div>
                             @endforeach
+>>>>>>> c51930642c02e0af71842b67559a9b617d0c5b61
                         </div>
                     </div>
                     <div class="progress-info mt-2">
