@@ -17,7 +17,7 @@ class PortalController extends Controller
      */
     public function index()
     {
-        $portal = PortalSet::latest()->paginate(10);
+        $portal = PortalSet::withCount('groups')->latest()->paginate();
         return view("admin.portal.index", compact("portal"));
     }
 
@@ -40,8 +40,7 @@ class PortalController extends Controller
         if($portalSet){
             $group = Group::where('portal_set_id',$portalSet->id)->count();
             if ($group < 52) {
-            return redirect()->back()->with('error', 'Previous portal is not full !');
-                
+                return redirect()->back()->with('error', 'Previous portal is not full !');                
             }
         }
         // 1. Create Portal Set

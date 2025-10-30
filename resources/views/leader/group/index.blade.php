@@ -373,7 +373,7 @@
                                                     <div class="input-group">
                                                         <input type="text" id="inviteLink{{ $group->id }}" 
                                                                class="form-control" readonly 
-                                                               value="{{ route('user.register', $group->invite_link) }}">
+                                                               value="You are invited to invest in '{{ $group->project_name }}' as a potential investor. Click here to register: {{ route('user.register', $group->invite_link) }}">
                                                         <button class="btn btn-outline-primary copy-btn" 
                                                                 data-target="inviteLink{{ $group->id }}">
                                                             <i data-feather="copy"></i> Copy
@@ -389,11 +389,11 @@
                                                                 data-platform="whatsapp">
                                                             <i data-feather="message-circle"></i> WhatsApp
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-primary share-btn" 
+                                                        <!-- <button class="btn btn-sm btn-outline-primary share-btn" 
                                                                 data-link="{{ route('user.register', $group->invite_link) }}" 
                                                                 data-platform="email">
                                                             <i data-feather="mail"></i> Email
-                                                        </button>
+                                                        </button> -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -424,7 +424,7 @@
                             <i data-feather="users"></i>
                             <h4>No Groups Found</h4>
                             <p>You are not currently managing any groups.</p>
-                            <a href="#" class="btn btn-primary mt-2">
+                            <a href="{{ Route('leader.groups.create') }}" class="btn btn-primary mt-2">
                                 <i data-feather="plus" class="me-1"></i> Create Your First Group
                             </a>
                         </div>

@@ -242,6 +242,7 @@
                                 <tr>
                                     <th width="80">#</th>
                                     <th>Portal Details</th>
+                                    <th width="150">Current Groups</th>
                                     <th width="150">Total Groups</th>
                                     <th width="120">Actions</th>
                                 </tr>
@@ -279,6 +280,12 @@
                                                     {{ $val->is_active ? 'Active' : 'Inactive' }}
                                                 </span>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <span class="total-groups">
+                                                <i class="bi bi-people-fill"></i>
+                                                {{ $val->groups_count ?? 0 }} Groups
+                                            </span>
                                         </td>
                                         <td>
                                             <span class="total-groups">

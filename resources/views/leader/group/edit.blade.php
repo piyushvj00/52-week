@@ -127,22 +127,22 @@
                                         <div class="form-section">
                                             <h5 class="section-title">
                                                 <i class="fas fa-info-circle me-2 text-primary"></i>
-                                                Project Information
+                                                Business Information
                                             </h5>
                                             <div class="row">
                                                 <!-- Project Name -->
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Project Name <span class="text-danger">*</span></label>
+                                                    <label class="form-label">Business Name <span class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <span class="input-group-text bg-light">
                                                             <i class="fas fa-tag text-primary"></i>
                                                         </span>
                                                         <input type="text" class="form-control" name="project_name" 
-                                                               placeholder="Enter project name" 
+                                                               placeholder="Enter Business name" 
                                                                value="{{ old('project_name', $groups->project_name) }}"
                                                                required>
                                                     </div>
-                                                    <div class="form-text">Enter a descriptive name for your project</div>
+                                                    <div class="form-text">Enter a descriptive name for your Business</div>
                                                     @error('project_name') 
                                                         <div class="text-danger small mt-1">
                                                             <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
@@ -152,17 +152,17 @@
                                                 
                                                 <!-- Project Description -->
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Project Description <span class="text-danger">*</span></label>
+                                                    <label class="form-label">Business Description <span class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <span class="input-group-text bg-light">
                                                             <i class="fas fa-align-left text-primary"></i>
                                                         </span>
                                                         <input type="text" class="form-control" name="project_description" 
-                                                               placeholder="Enter project description" 
+                                                               placeholder="Enter Business description" 
                                                                value="{{ old('project_description', $groups->project_description) }}"
                                                                required>
                                                     </div>
-                                                    <div class="form-text">Brief description of your project goals</div>
+                                                    <div class="form-text">Brief description of your Business goals</div>
                                                     @error('project_description') 
                                                         <div class="text-danger small mt-1">
                                                             <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}

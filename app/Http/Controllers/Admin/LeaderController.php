@@ -97,12 +97,13 @@ class LeaderController extends Controller
             $totalGroups = Group::where('portal_set_id', $portalSet->id)
                 ->where('group_number', '>=', 6) // exclude reserved 1–5
                 ->count();
-
             $nameIndex = $totalGroups % count($names);
+
             $cycle = intdiv($totalGroups, count($names));
 
             $baseName = $names[$nameIndex];
             $groupName = $cycle > 0 ? $baseName . $cycle : $baseName;
+
             $inviteLink = Str::uuid()->toString();
 
 
