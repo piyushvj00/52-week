@@ -57,6 +57,12 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+
     /**
      * Get all contributions made by user
      */

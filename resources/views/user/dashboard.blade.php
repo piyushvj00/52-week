@@ -371,7 +371,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="stat-value">{{ $startDate->format('M j') ?? 'N/A' }}</div>
+                                            <div class="stat-value">{{ $startDate->format('M j y') ?? 'N/A' }}</div>
                                             <div class="stat-label">Start Date</div>
                                             <div class="stat-trend trend-up">
                                                 <i data-feather="clock"></i> Portal Start
@@ -391,7 +391,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="stat-value">{{ $endDate->format('M j') ?? 'N/A' }}</div>
+                                            <div class="stat-value">{{ $endDate->format('M j y') ?? 'N/A' }}</div>
                                             <div class="stat-label">End Date</div>
                                             <div class="stat-trend trend-down">
                                                 <i data-feather="alert-circle"></i> Portal End
@@ -554,6 +554,13 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    fetch("{{ url('user/contribution-trends') }}")
+        .then(response => response.json())
+        .then(result => {
+            const contributionCtx = document.getElementById('contributionTrendsChart').getContext('2d');
+        });
+
+
     // Chart colors
     const colors = {
         primary: '#7367f0',
@@ -564,7 +571,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     // Contribution Trends Chart
-    const contributionCtx = document.getElementById('contributionTrendsChart').getContext('2d');
+    // const contributionCtx = document.getElementById('contributionTrendsChart').getContext('2d');
     new Chart(contributionCtx, {
         type: 'line',
         data: {

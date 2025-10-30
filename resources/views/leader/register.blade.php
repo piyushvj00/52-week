@@ -10,11 +10,11 @@
     <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="PIXINVENT">
     <title>Register Page - ekero - Bootstrap HTML admin template</title>
-    <link rel="apple-touch-icon" href="{{ asset('admin/app-assets/images/icao/apple-icon-120.png')}}"> -->
+    <link rel="apple-touch-icon" href="{{ asset('admin/app-assets/images/icao/apple-icon-120.png')}}">
     <!-- <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/newlogo.png')}}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
-    <!-- BEGIN: Vendor CSS-->
+     BEGIN: Vendor CSS-->
     <link rel="stylesheet" type="text/css" href="{{ asset('admin/app-assets/vendors/css/vendors.min.css')}}">
     <!-- END: Vendor CSS-->
 
