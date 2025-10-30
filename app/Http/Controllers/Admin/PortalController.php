@@ -45,6 +45,7 @@ class PortalController extends Controller
         }
         // 1. Create Portal Set
         $portalSet = new PortalSet();
+        
         $portalSet->fill($request->all());
         $portalSet->save();
 

@@ -208,6 +208,29 @@
                                                         </div>
                                                     @enderror
                                                 </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Number Of Shares <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-calculator"></i></span>
+                                                        <input type="number" step="0.01" class="form-control" id="number_of_shares" name="number_of_shares" value="{{ $portal->number_of_shares }}" readonly>
+                                                    </div>
+                                                    <div class="form-text"> Number Of Shares for Each Week Amount</div>
+                                                    @error('number_of_shares') 
+                                                        <small class="text-danger">{{ $message }}</small> 
+                                                    @enderror
+                                                </div>
+
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Single Share Value <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                                        <input type="number" step="0.01" class="form-control" id="share_price" name="share_price" placeholder="Each Share Price" value="{{ $portal->share_price }}" readonly>
+                                                    </div>
+                                                    <div class="form-text">This Is Per Share Value</div>
+                                                    @error('share_price') 
+                                                        <small class="text-danger">{{ $message }}</small> 
+                                                    @enderror
+                                                </div>
                                             </div>
                                         </div>
                                         

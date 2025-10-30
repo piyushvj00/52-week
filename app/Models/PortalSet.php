@@ -11,6 +11,8 @@ class PortalSet extends Model
     protected $fillable = [
         'name',
         'total_portals',
+        'number_of_shares',
+        'share_price',
         'target_amount',
         'start_date',
         'end_date',

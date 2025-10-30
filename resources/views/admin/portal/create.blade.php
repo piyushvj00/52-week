@@ -143,16 +143,44 @@
                                             </h5>
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Target Amount <span class="text-danger">*</span></label>
+                                                    <label class="form-label">Weekly Target Amount <span class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
-                                                        <input type="number" step="0.01" class="form-control" name="target_amount" placeholder="Enter target amount" value="{{ old('target_amount') }}">
+                                                        <input type="number" step="0.01" class="form-control" id="target_amount" name="target_amount" placeholder="Enter target amount" value="{{ old('target_amount') }}">
                                                     </div>
-                                                    <div class="form-text">Set your financial goal for this portal</div>
+                                                    <div class="form-text">Set your financial goal for this portal for Each week</div>
                                                     @error('target_amount') 
                                                         <small class="text-danger">{{ $message }}</small> 
                                                     @enderror
                                                 </div>
+
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Number Of Shares <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-calculator"></i></span>
+                                                        <input type="number" step="0.01" class="form-control" id="number_of_shares" name="number_of_shares" placeholder="Enter Number Of Shares" value="{{ old('number_of_shares') }}">
+                                                    </div>
+                                                    <div class="form-text">Set Number Of Shares for Each Week Amount</div>
+                                                    @error('number_of_shares') 
+                                                        <small class="text-danger">{{ $message }}</small> 
+                                                    @enderror
+                                                </div>
+
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Single Share Value <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                                        <input type="number" step="0.01" class="form-control" id="share_price" name="share_price" placeholder="Each Share Price" value="" readonly>
+                                                    </div>
+                                                    <div class="form-text">This Is Per Share Value</div>
+                                                    @error('share_price') 
+                                                        <small class="text-danger">{{ $message }}</small> 
+                                                    @enderror
+                                                </div>
+
+
+
+
                                             </div>
                                         </div>
                                         
@@ -428,4 +456,26 @@
             });
         });
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const targetInput = document.getElementById('target_amount');
+    const sharesInput = document.getElementById('number_of_shares');
+    const priceInput = document.getElementById('share_price');
+
+    function calculateSharePrice() {
+        const target = parseFloat(targetInput.value);
+        const shares = parseFloat(sharesInput.value);
+
+        if (!isNaN(target) && !isNaN(shares) && shares > 0) {
+            const price = target / shares;
+            priceInput.value = price.toFixed(2); // round to 2 decimals
+        } else {
+            priceInput.value = '';
+        }
+    }
+
+    targetInput.addEventListener('input', calculateSharePrice);
+    sharesInput.addEventListener('input', calculateSharePrice);
+});
+</script>
 @endsection

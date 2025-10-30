@@ -24,6 +24,7 @@ class StorePortalRequest extends FormRequest
         return [
             'name' => 'required',
             'total_portals' => 'required',
+            'number_of_shares' => 'required|numeric|min:2|max:100',
               'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
                         'target_amount' => 'required|numeric|min:1',

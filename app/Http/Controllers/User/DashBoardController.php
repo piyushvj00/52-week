@@ -33,12 +33,16 @@ class DashBoardController extends Controller
         $contributions = Contribution::where('user_id', $user->id)->latest()->get();
         $weeklyCommitment = GroupMember::where('user_id', $user->id)->first()->weekly_commitment;
 
+        $userContribution = Contribution::where('user_id', $user->id)->sum('amount');
+        $groupContribution = Contribution::where('group_id', $groupId)->sum('amount');
+
+
         $supportDetails = HelpSupport::first();
 
-        // dd($group , $portal , $contributions , $weeklyCommitment);
 
         $supportDetails = HelpSupport::first();
-        return view("user.dashboard", compact('user',"group" , "portal", "leader" , "groupMembers" , "contributions",'weeklyCommitment', 'supportDetails'));
+        $groupContribution = Contribution::where('group_id', $groupId)->sum('amount');
+        return view("user.dashboard", compact('user',"group" , "portal", "leader" , "groupMembers" , "contributions",'weeklyCommitment', 'supportDetails' , 'userContribution','groupContribution'));
 
     }
 
