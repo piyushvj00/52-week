@@ -166,7 +166,7 @@
                                                 </div>
                                                 
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Total Portals <span class="text-danger">*</span></label>
+                                                    <label class="form-label">Total Groups <span class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <span class="input-group-text bg-light">
                                                             <i class="fas fa-hashtag text-primary"></i>
@@ -192,7 +192,7 @@
                                             </h5>
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Target Amount <span class="text-danger">*</span></label>
+                                                    <label class="form-label">Weekly Target Amount <span class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <span class="input-group-text bg-light">
                                                             <i class="fas fa-dollar-sign text-primary"></i>
