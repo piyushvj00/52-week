@@ -38,6 +38,8 @@ class DashBoardController extends Controller
 
 
         $supportDetails = HelpSupport::first();
+
+        // dd($group->id , $groupId);
          
         return view("user.dashboard", compact('user',"group" , "portal", "leader" , "groupMembers" , "contributions",'weeklyCommitment', 'supportDetails' , 'userContribution','groupContribution'));
 

@@ -1,4 +1,4 @@
-@extends('user.layouts.main')
+            @extends('user.layouts.main')
  
 @section('title', 'Group Details')
 <style>
@@ -406,6 +406,7 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
             </div>
 
             <!-- Contributions History -->
+             {{-- 
             <div class="card dashboard-card">
                 <div class="card-header-custom">
                     <h4 class="card-title text-white mb-0">My Contribution History</h4>
@@ -467,6 +468,8 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                     </div>
                 </div>
             </div>
+
+            --}}
 
         </div>
     </div>

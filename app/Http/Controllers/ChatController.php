@@ -16,7 +16,7 @@ class ChatController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->role == 3) {
+        if (auth()->user()->role == 3 ) {                                                                                                                                                                                        
             $users = User::where('id', '!=', Auth::id())
                 ->where(function ($q) {
                     $q->whereHas('messagesSent', function ($query) {

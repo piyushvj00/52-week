@@ -240,6 +240,10 @@
                             <a href="{{ route('leader.group') }}" class="quick-action-btn">
                                 <i data-feather="users"></i> My Group
                             </a>
+                            <!-- <a href="{{ route('leader.group') }}" class="quick-action-btn">
+                                <i data-feather="users"></i> My Group
+                            </a> -->
+                            <!-- comment for maja -->
                             <a href="{{ route('leader.contribution') }}" class="quick-action-btn">
                                 <i data-feather="dollar-sign"></i> Contributions
                             </a>
