@@ -60,10 +60,14 @@ ease;
                 <span class="navigation-header-text">Management</span>
                 <i data-feather="more-horizontal" class="navigation-header-icon"></i>
             </li>
+             @php
+              $user = Auth::user();
+              $groupId = \App\Models\GroupMember::where('user_id',$user->id)->first()->group_id;
+            @endphp
 
             <!-- Group Details -->
             <li class="nav-item">
-                <a class="d-flex align-items-center {{ request()->routeIs('user.group.*') ? 'active' : '' }}"
+                <a class="d-flex align-items-center {{ request()->routeIs('user.group.details*') ? 'active' : '' }}"
                 href="{{ route('user.group.details') }}">
                     <div class="menu-icon-wrapper">
                         <i data-feather="clipboard" class="menu-icon ms-1"></i>
@@ -75,7 +79,7 @@ ease;
 
             <!-- Group  Members-->
             <li class="nav-item">
-                <a class="d-flex align-items-center {{ request()->routeIs('user.group.*') ? 'active' : '' }}"
+                <a class="d-flex align-items-center {{ request()->routeIs('user.group.member') ? 'active' : '' }}"
                 href="{{ route('user.group.member') }}">
                     <div class="menu-icon-wrapper">
                         <i data-feather="users" class="menu-icon ms-1"></i>
@@ -96,9 +100,20 @@ ease;
                     <span class="menu-badge badge bg-light-warning">Money</span>
                 </a>
             </li>
-            <!-- Contribution Management -->
+            <!-- Group Chat -->
             <li class="nav-item">
-                <a class="d-flex align-items-center {{ request()->routeIs('user.contribution.*') ? 'active' : '' }}"
+                <a class="d-flex align-items-center {{ request()->routeIs('user.groups.chat') ? 'active' : '' }}"
+                href="{{ route('user.groups.chat' , $groupId ) }}">
+                    <div class="menu-icon-wrapper">
+                        <i data-feather="message-square" class="menu-icon ms-1"></i>
+                    </div>
+                    <span class="menu-title text-truncate">Group Chat</span>
+                    <span class="menu-badge badge bg-light-warning">Texting</span>
+                </a>
+            </li>
+            <!-- Payment Reciepts -->
+            <li class="nav-item">
+                <a class="d-flex align-items-center {{ request()->routeIs('user.payment.reciept') ? 'active' : '' }}"
                 href="{{ route('user.payment.reciept') }}">
                     <div class="menu-icon-wrapper">
                         <i data-feather="file-text" class="menu-icon ms-1"></i>

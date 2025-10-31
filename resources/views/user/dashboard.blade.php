@@ -305,7 +305,7 @@
                         <h5 class="text-white mb-3">Portal Progress</h5>
                         <div class="d-flex align-items-center mb-2">
                             <span class="me-3">Week {{ $weekNumber }} of {{ $totalWeeks }}</span>
-                            <span class="badge bg-light text-dark">{{ number_format($progressPercentage, 1) }}% Complete</span>
+                            <span class="badge bg-light text-dark">{{ number_format($progressPercentage) }}% Complete</span>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -509,7 +509,7 @@
                                         <div class="stat-label">You Contributed</div>
                                     </div>
                                     <div class="col-6 mb-4">
-                                        <div class="stat-value text-warning">${{  }}</div>
+                                        <div class="stat-value text-warning">${{ $portal->target_amount }}</div>
                                         <div class="stat-label">Group's Week Target</div>
                                     </div>
                                     <div class="col-6 mb-4">

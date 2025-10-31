@@ -96,13 +96,29 @@ class DashBoardController extends Controller
         'weeksRemaining'
     ));
 }
+
+     public function xyz()  {
+        
+        $groups = PortalSet::with('groups')->get();
+        
+        dd($groups);
+
+     }
     public function group()
     {
-        $groups = Group::where('leader_id', auth()->user()->id)->first(); 
+        $groups = Group::where('leader_id', auth()->user()->id)->first();
         // dd($groups);
         $member = User::where('role', 3)->latest()->get();
         $portalSet = PortalSet::where('id', $groups->portal_set_id )->first();
-        return view('leader.group.index', compact('groups', 'member','portalSet'));
+
+        // other needed variables
+
+        $portalGroupCount = Group::where('portal_set_id', $groups->portal_set_id)->count();
+
+        // dd($groups->where('is_active',true AND 'portal_set_id', $groups->portal_set_id)->count());
+
+
+        return view('leader.group.index', compact('groups', 'member','portalSet','portalGroupCount'));
     }
     public function groupCreate()
     {

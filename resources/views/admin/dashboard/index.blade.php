@@ -424,7 +424,7 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <div class="stat-value">{{ $contribution ?? '0' }}</div>
-                                            <div class="stat-label">Contributions</div>
+                                            <div class="stat-label">Portal's Contribution</div>
                                             <!-- <div class="stat-trend trend-up">
                                                 <i data-feather="trending-up"></i> 15% increase
                                             </div> -->
@@ -444,7 +444,7 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <div class="stat-value">
-                                                {{ $portalSet && $portalSet->end_date ? \Carbon\Carbon::parse($portalSet->end_date)->format('M j') : 'N/A' }}
+                                                {{ $portalSet && $portalSet->end_date ? \Carbon\Carbon::parse($portalSet->end_date)->format('M j, y') : 'N/A' }}
                                             </div>
                                             <div class="stat-label">Portal End Date</div>
                                             <div class="stat-trend trend-down">

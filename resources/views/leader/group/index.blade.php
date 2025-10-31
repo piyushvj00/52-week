@@ -240,7 +240,7 @@
                 <div class="content-header-left col-md-9 col-12 mb-2">
                     <div class="row breadcrumbs-top">
                         <div class="col-12">
-                            <h2 class="content-header-title float-start mb-0">My Groups</h2>
+                            <h2 class="content-header-title float-start mb-0">My Portal Details</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="{{ route('leader.dashboard') }}">Home</a></li>
@@ -256,16 +256,16 @@
                 <!-- Stats Summary -->
                 <div class="stats-summary">
                     <div class="stat-card">
-                        <div class="stat-value">{{ $groups->count() }}</div>
+                        <div class="stat-value">{{ $portalGroupCount }}</div>
                         <div class="stat-label">Total Groups</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">{{ $groups->where('is_active', true)->count() }}</div>
+                        <div class="stat-value">{{ $groups->where('is_active',true AND 'portal_set_id', $groups->portal_set_id)->count() }}</div>
                         <div class="stat-label">Active Groups</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">${{ number_format($groups->sum('target_amount'), 2) }}</div>
-                        <div class="stat-label">Total Target</div>
+                        <div class="stat-value">${{ number_format($groups->where('is_active',true AND 'portal_set_id', $groups->portal_set_id)->sum('target_amount'), 2) }}</div>
+                        <div class="stat-label">Portal Weekly Target</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">${{ number_format($groups->sum('current_amount'), 2) }}</div>
@@ -275,8 +275,8 @@
 
                 <!-- Groups Grid -->
                 <div class="groups-container">
-                    <div class="table-header-custom">
-                        <h4><i class="bi bi-people-fill me-2"></i>Managed Groups</h4>
+                    <div class="table-header-custom ">
+                        <h4  class="text-white"><i class="bi bi-people-fill me-2"></i>My Group</h4>
                     </div>
 
                     @if($groups->count() > 0)
