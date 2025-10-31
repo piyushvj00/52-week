@@ -71,6 +71,10 @@
         </div>
     </div>
 </div>
+            @php
+              $user = Auth::user();
+              $groupId = \App\Models\GroupMember::where('user_id',$user->id)->first()->group_id;
+            @endphp
 <div class="sidenav-overlay"></div>
 <div class="drag-target"></div>
 
@@ -283,7 +287,7 @@
     });
 
     function fetchMessages() {
-        $.get('{{ route("groups.chat.messages", $group->id) }}', function(data) {
+        $.get('{{ route("user.groups.chat.messages", $groupId) }}', function(data) {
             let html = '';
             console.log(data);
 
@@ -344,7 +348,7 @@
             let message = $('#message').val();
             if(message.trim() === '') return;
 
-            $.post('{{ route("groups.chat.store", $group->id) }}', $(this).serialize(), function(data) {
+            $.post('{{ route("user.groups.chat.store", $groupId) }}', $(this).serialize(), function(data) {
                 $('#message').val('');
                 fetchMessages();
             });

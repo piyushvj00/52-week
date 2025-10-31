@@ -73,6 +73,8 @@ Route::prefix('leader')->group(function () {
   Route::post('/send-otp-password', [LeaderAuthController::class, 'sendOtpPassword'])->name('leader.send.otp.pass');
   Route::post('/forget-password', [LeaderAuthController::class, 'forgetPassStore'])->name('leader.forget.password.store');
 
+  Route::get('/xyz', [LeaderDashBoardController::class, 'xyz'])->name('leader.xyz');
+
   // middle ware applied routes for the leader
   Route::middleware('leader')->group(function () {
     Route::get('/dashboard', [LeaderDashBoardController::class, 'dashboard'])->name('leader.dashboard');
@@ -134,9 +136,11 @@ Route::prefix('user')->group(function () {
 
    
       // group char for user
-      Route::get('groups/{group}/chat', [GroupController::class, 'index'])->name('groups.chat');
-      Route::post('groups/{group}/chat', [GroupController::class, 'store'])->name('groups.chat.store');
-      Route::get('groups/{group}/chat/messages', [GroupController::class, 'messages'])->name('groups.chat.messages');
+      Route::get('groups/{group}/chat', [GroupController::class, 'index'])->name('user.groups.chat');
+      Route::post('groups/{group}/chat', [GroupController::class, 'store'])->name('user.groups.chat.store');
+      Route::get('groups/{group}/chat/messages', [GroupController::class, 'messages'])->name('user.groups.chat.messages');
+
+      // logout route
       Route::get('/logout', [GroupController::class, 'logout'])->name('user.logout');
 
 

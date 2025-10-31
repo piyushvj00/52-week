@@ -240,7 +240,7 @@
                 <div class="content-header-left col-md-9 col-12 mb-2">
                     <div class="row breadcrumbs-top">
                         <div class="col-12">
-                            <h2 class="content-header-title float-start mb-0">My Groups</h2>
+                            <h2 class="content-header-title float-start mb-0">My Portal Details</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="{{ route('leader.dashboard') }}">Home</a></li>
@@ -256,16 +256,16 @@
                 <!-- Stats Summary -->
                 <div class="stats-summary">
                     <div class="stat-card">
-                        <div class="stat-value">{{ $groups->count() }}</div>
+                        <div class="stat-value">{{ $portalGroupCount }}</div>
                         <div class="stat-label">Total Groups</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">{{ $groups->where('is_active', true)->count() }}</div>
+                        <div class="stat-value">{{ $groups->where('is_active',true AND 'portal_set_id', $groups->portal_set_id)->count() }}</div>
                         <div class="stat-label">Active Groups</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">${{ number_format($groups->sum('target_amount'), 2) }}</div>
-                        <div class="stat-label">Total Target</div>
+                        <div class="stat-value">${{ number_format($groups->where('is_active',true AND 'portal_set_id', $groups->portal_set_id)->sum('target_amount'), 2) }}</div>
+                        <div class="stat-label">Portal Weekly Target</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">${{ number_format($groups->sum('current_amount'), 2) }}</div>
@@ -275,93 +275,45 @@
 
                 <!-- Groups Grid -->
                 <div class="groups-container">
-                    <div class="table-header-custom">
-                        <h4><i class="bi bi-people-fill me-2"></i>Managed Groups</h4>
+                    <div class="table-header-custom ">
+                        <h4  class="text-white"><i class="bi bi-people-fill me-2"></i>My Group</h4>
                     </div>
 
-                    @if($groups)
-    <div class="groups-grid">
-        <div class="group-card">
-            <div class="group-card-header">
-                <div class="group-card-title d-flex justify-content-between">
-                    <span>Group : {{ $groups->name ?? 'Unnamed Group' }}</span>
-                    <span class="group-number">Num : {{ $groups->group_number }}</span>
-                    <span >Portal : {{ $portalSet->name ??'Portal' }}</span>
-
-                </div>
-                <div class="group-card-extra text-end">
-                </div>
-
-                                    <div class="group-card-footer">
-                                        <a href="{{ route('leader.groups.member', $group->id) }}" 
-                                           class="btn-action btn-view">
-                                            <i data-feather="users"></i> Members
-                                        </a>
-                                        <a href="{{ route('leader.groups.edit', $group->id) }}" 
-                                           class="btn-action btn-edit">
-                                            <i data-feather="edit"></i> Edit
-                                        </a>
-                                        <button class="btn-action btn-invite" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#inviteModal{{ $group->id }}">
-                                            <i data-feather="user-plus"></i> Invite
-                                        </button>
+                    @if($groups->count() > 0)
+                        <div class="groups-grid">
+                                <div class="group-card">
+                                    <div class="group-card-header">
+                                        <div class="group-card-title">
+                                            <span>{{ $group->name ?? 'Unnamed Group' }}</span>
+                                            <span class="group-number">#{{ $groups->group_number }}</span>
+                                        </div>
+                                        @if($groups->project_name)
+                                            <p class="group-card-subtitle">{{ $groups->project_name }}</p>
+                                        @endif
                                     </div>
-                                </div>
-
-                                <!-- Invite Modal for each group -->
-                                <div class="modal fade" id="inviteModal{{ $group->id }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Invite Member to {{ $group->name }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    
+                                    <div class="group-card-body">
+                                        <!-- Progress Section -->
+                                        <div class="progress-container">
+                                            <div class="progress-info">
+                                                <span class="info-label">Progress</span>
+                                                <span class="info-value">
+                                                    @if($groups->target_amount > 0)
+                                                        {{ number_format(($groups->current_amount / $groups->target_amount) * 100, 1) }}%
+                                                    @else
+                                                        0%
+                                                    @endif
+                                                </span>
                                             </div>
-                                            <div class="modal-body">
-                                                <p>Share this invitation link with new members to join your group:</p>
-                                                <div class="invite-link-container">
-                                                    <div class="input-group">
-                                                        <input type="text" id="inviteLink{{ $group->id }}" 
-                                                               class="form-control" readonly 
-                                                               value=" {{ route('user.register',['link' => $group->invite_link]) }}">
-                                                        <button class="btn btn-outline-primary copy-btn" 
-                                                                data-target="inviteLink{{ $group->id }}">
-                                                            <i data-feather="copy"></i> Copy
-                                                        </button>
-                                                    </div>
-                                                    <small class="text-success mt-2 d-none copied-msg">Copied to clipboard!</small>
-                                                </div>
-                                                <div class="mt-3">
-                                                    <p class="small text-muted mb-2">You can also share via:</p>
-                                                    <div class="d-flex gap-2">
-                                                        <button class="btn btn-sm btn-outline-success share-btn" 
-                                                               onclick="shareOnWhatsApp()"
-                                                                data-platform="whatsapp">
-                                                            <i data-feather="message-circle"></i> WhatsApp
-                                                        </button>
-                                                        <!-- <button class="btn btn-sm btn-outline-primary share-btn" 
-                                                                data-link="{{ route('user.register', $group->invite_link) }}" 
-                                                                data-platform="email">
-                                                            <i data-feather="mail"></i> Email
-                                                        </button> -->
-                                                    </div>
-                                                </div>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: {{ $groups->target_amount > 0 ? ($groups->current_amount / $groups->target_amount) * 100 : 0 }}%"></div>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <div class="progress-info mt-2">
+                                                <small class="text-muted">
+                                                    ${{ number_format($groups->current_amount, 2) }} of ${{ number_format($groups->target_amount, 2) }}
+                                                </small>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    <div class="progress-info mt-2">
-                        <small class="text-muted">
-                            ${{ number_format($groups->current_amount, 2) }} of ${{ number_format($groups->target_amount, 2) }}
-                        </small>
-                    </div>
-                </div>
 
                                         <!-- Group Information -->
                                         <div class="group-info-list">
