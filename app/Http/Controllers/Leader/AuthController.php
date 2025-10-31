@@ -45,7 +45,7 @@ class AuthController extends Controller
             Log::info('New Leader user created successfully.', ['user_id' => $user->id]);
             
             // --- 2. PortalSet Check ---
-            $portalSet = PortalSet::where('is_active', 1)->first();
+            $portalSet = PortalSet::where('isFull', 1)->first();
             
             if (!$portalSet) {
                 Log::error('CRITICAL: No active PortalSet found for leader registration.', ['user_email' => $request->email]);

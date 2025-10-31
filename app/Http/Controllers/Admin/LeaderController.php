@@ -23,7 +23,10 @@ class LeaderController extends Controller
     public function index()
     {
         $leader = User::with('group')->where('role', 2)->latest()->paginate(10);
-        return view('admin.users.index', compact('leader'));
+        $totalActiveLeader = User::where('role',2)->where('status',1)->count();
+        $totalLeader = User::where('role',2)->count();
+        $totalInactiveLeader = User::where('role',2)->where('status',0)->count();
+        return view('admin.users.index', compact('leader','totalActiveLeader','totalInactiveLeader','totalLeader'));
     }
 
     /**
@@ -74,7 +77,7 @@ class LeaderController extends Controller
                 $videoPath = $request->file('video')->store('portal-videos', 'public');
             }
 
-            $portalSet = PortalSet::where('is_active', 1)->first();
+            $portalSet = PortalSet::where('isFull', 1)->first();
 
 
             Group::where('portal_set_id', $portalSet->id)

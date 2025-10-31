@@ -65,7 +65,7 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <h4 class="mb-0">{{ $portal->total_portals }}</h4>
-                                        <small class="text-muted">Total Portals</small>
+                                        <small class="text-muted">Total Groups</small>
                                     </div>
                                 </div>
                             </div>
@@ -294,9 +294,9 @@
                                                         <i class="fas fa-arrow-left me-1"></i> Cancel
                                                     </a>
                                                     <div class="d-flex gap-2">
-                                                        <button type="reset" class="btn btn-outline-warning">
+                                                        <!-- <button type="reset" class="btn btn-outline-warning">
                                                             <i class="fas fa-undo me-1"></i> Reset
-                                                        </button>
+                                                        </button> -->
                                                         <button type="submit" class="btn btn-primary">
                                                             <i class="fas fa-save me-1"></i> Update Portal
                                                         </button>

@@ -240,8 +240,8 @@
 
                                         <!-- Action Buttons -->
                                         <div class="col-12 mt-4 pt-3 border-top">
-                                            <button type="submit" class="btn btn-gradient">
-                                                <i data-feather="save" style="width: 16px; height: 16px;"></i> Save Support Settings
+                                            <button type="submit" style=";color:white !important" class="btn btn-gradient">
+                                                <i data-feather="save" style="width: 16px; height: 16px"></i> Save Support Settings
                                             </button>
                                             <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary ms-2">
                                                 <i data-feather="arrow-left" style="width: 16px; height: 16px;"></i> Back to Dashboard

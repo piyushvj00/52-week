@@ -18,7 +18,7 @@ class DashBoardController extends Controller
 
     public function dashboard()
     {
-    $portalSet = PortalSet::where('is_active', 1)->first();
+    $portalSet = PortalSet::where('isFull', 1)->first();
     $group = Group::where('leader_id', auth()->user()->id)->first();
     
     if (!$group) {

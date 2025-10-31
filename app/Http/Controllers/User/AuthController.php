@@ -31,7 +31,7 @@ class AuthController extends Controller
         if ($request['link']) {
             $group = Group::where('invite_link', $request['link'])->first();
             $portalSet = PortalSet::find($group->portal_set_id);
-            return view('user.compney-data', compact('group','portalSet'));
+            return view('user.compney-data', compact('group', 'portalSet'));
         }
         return view("user.register", compact('link'));
     }
@@ -200,7 +200,17 @@ class AuthController extends Controller
         $user->save();
         return redirect()->route('user.login')->with('success', 'PassWord Updated. Please login.');
     }
+    public function test()
+    {
+        $arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        $rev = [];
 
+        for ($i = count($arr) - 1; $i >= 0; $i--) {
+            $rev[] = $arr[$i];
+        }
 
+        dd($rev);
+
+    }
 }
 
