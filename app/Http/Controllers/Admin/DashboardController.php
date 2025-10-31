@@ -24,7 +24,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $portalSet = PortalSet::where('is_active', 1)->first();
+        $portalSet = PortalSet::where('isFull', 1)->first();
 
         $groupCount = $portalSet ? Group::where('portal_set_id', $portalSet->id)->count() : 0;
         $groupIds = $portalSet ? Group::where('portal_set_id', $portalSet->id)->pluck('id') : collect();
@@ -167,6 +167,8 @@ class DashboardController extends Controller
             ->merge($targetAchievements)
             ->sortByDesc('time')
             ->take(6); // Limit to 6 most recent activities
+
+            $latestLeader = Group::with('user')->latest()->first(); 
 
         return view('admin.dashboard.index', compact(
             'groupCount',

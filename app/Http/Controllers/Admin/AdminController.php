@@ -20,7 +20,7 @@ class AdminController extends Controller
      */
     public function index()
     {
-       $portalSet = PortalSet::where('is_active', 1)->first();
+       $portalSet = PortalSet::where('isFull', 1)->first();
 
         $groups = Group::with('leader')->where('portal_set_id',$portalSet->id)->latest()->paginate(10);
         return view("admin.groups.index", compact("groups"));
@@ -117,12 +117,21 @@ class AdminController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        Group::destroy($id);
-        return redirect()->route('groups.index')->with('success', 'Deleted group successfully');
+  public function destroy(string $id)
+{
+    $deleted = Group::whereNotIn('group_number', [1,2,3,4,5])
+                    ->where('id', $id)
+                    ->delete();
 
+    if ($deleted) {
+        return redirect()->route('groups.index')
+                         ->with('success', 'Group deleted successfully');
+    } else {
+        return redirect()->route('groups.index')
+                         ->with('error', 'You cannot delete this default group');
     }
+}
+
     public function assignMember($id)
     {
         $group = Group::findOrFail($id);

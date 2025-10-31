@@ -29,6 +29,7 @@ use App\Http\Controllers\User\DashBoardController as UserDashBoardController;
 // });
 // Route for the user login to web page
 Route::get('/', [UserAuthController::class, 'register'])->name('user.register');
+Route::get('/test', [UserAuthController::class, 'test']);
 
 // All Routes for the admin(role - 1) -------------------------------------------------------------
 

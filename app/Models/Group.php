@@ -47,4 +47,8 @@ public function chats()
 {
     return $this->hasMany(GroupChat::class);
 }
+
+public function user(){
+    return $this->belongsTo(User::class,'leader_id');
+}
 }

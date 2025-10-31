@@ -224,11 +224,11 @@
                 <!-- Stats Summary -->
                 <div class="stats-summary">
                     <div class="stat-card">
-                        <div class="stat-value">{{ $leader->total() }}</div>
+                        <div class="stat-value">{{ $totalLeader}}</div>
                         <div class="stat-label">Total Leaders</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">{{ $leader->where('status', 1)->count() }}</div>
+                        <div class="stat-value">{{ $totalActiveLeader ?? '' }}</div>
                         <div class="stat-label">Active Leaders</div>
                     </div>
                     <div class="stat-card">
