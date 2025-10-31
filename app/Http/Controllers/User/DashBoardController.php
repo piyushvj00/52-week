@@ -39,9 +39,8 @@ class DashBoardController extends Controller
 
         $supportDetails = HelpSupport::first();
 
-
-        $supportDetails = HelpSupport::first();
-        $groupContribution = Contribution::where('group_id', $groupId)->sum('amount');
+        // dd($group->id , $groupId);
+         
         return view("user.dashboard", compact('user',"group" , "portal", "leader" , "groupMembers" , "contributions",'weeklyCommitment', 'supportDetails' , 'userContribution','groupContribution'));
 
     }
