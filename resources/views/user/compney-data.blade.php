@@ -54,6 +54,77 @@
             transform: translateY(-5px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
+
+        /* Custom styles for the share input section */
+        .share-input-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .share-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .share-input-icon {
+            position: absolute;
+            left: 1rem;
+            color: #6b7280;
+            z-index: 10;
+        }
+
+        .share-input-field {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #111827;
+            transition: all 0.3s ease;
+            background-color: #f9fafb;
+        }
+
+        .share-input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .share-input-field:hover {
+            border-color: #9ca3af;
+        }
+
+        .share-calculator {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background-color: #f0f9ff;
+            border-radius: 0.5rem;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .share-calculator p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #1e40af;
+            font-weight: 500;
+        }
+
+        .share-calculator .total-amount {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 
@@ -103,14 +174,6 @@
                             <span class="font-semibold text-lg">${{ number_format($group->target_amount, 2) }}</span>
                         </div>
 
-                        <!-- <div class="flex justify-between items-center p-4 bg-white bg-opacity-10 rounded-xl">
-                            <div class="flex items-center">
-                                <i class="fas fa-users mr-3 text-blue-200"></i>
-                                <span>Current Progress</span>
-                            </div>
-                            <span class="font-semibold text-lg">{{ number_format(($group->current_amount / $group->target_amount) * 100, 1) }}%</span>
-                        </div> -->
-
                         <div class="flex justify-between items-center p-4 bg-white bg-opacity-10 rounded-xl">
                             <div class="flex items-center">
                                 <i class="fas fa-calendar-alt mr-3 text-blue-200"></i>
@@ -159,34 +222,43 @@
                             <div class="bg-blue-50 p-4 rounded-xl text-center">
                                 <div class="text-blue-600 font-semibold mb-1">Start Date</div>
                                 <div class="text-gray-900 font-bold">
-                                    {{ \Carbon\Carbon::parse($group->start_date)->format('M d, Y') }}</div>
+                                    {{ \Carbon\Carbon::parse($portalSet->start_date)->format('M d, Y') }}</div>
                             </div>
                             <div class="bg-green-50 p-4 rounded-xl text-center">
                                 <div class="text-green-600 font-semibold mb-1">End Date</div>
                                 <div class="text-gray-900 font-bold">
-                                    {{ \Carbon\Carbon::parse($group->end_date)->format('M d, Y') }}</div>
+                                    {{ \Carbon\Carbon::parse($portalSet->end_date)->format('M d, Y') }}</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Progress Bar -->
-                    <div class="mb-8">
-                        <!-- <div class="flex justify-between text-sm mb-2">
-                            <span class="text-gray-600 font-medium">Group Progress</span>
-                            <span class="text-gray-900 font-semibold">
-                                ${{ number_format($group->current_amount, 2) }} / ${{ number_format($group->target_amount, 2) }}
-                            </span>
-                        </div> -->
-                        <!-- <div class="w-full bg-gray-200 rounded-full h-3">
-                            <div class="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-1000" 
-                                 style="width: {{ ($group->current_amount / $group->target_amount) * 100 }}%">
-                            </div>
+                    <!-- Share Count Input Section -->
+                    <div class="share-input-container">
+                        <label for="share" class="share-input-label flex items-center">
+                            <i class="fas fa-layer-group text-blue-600 mr-2"></i>
+                            Number of Shares
+                        </label>
+                        <div class="share-input-wrapper">
+                            <i class="fas fa-hashtag share-input-icon"></i>
+                            <input 
+                                type="number" 
+                                id="share" 
+                                name="share" 
+                                min="1" 
+                                max="1000"
+                                value="1"
+                                class="share-input-field"
+                                placeholder="Enter number of shares"
+                                aria-describedby="shareHelp"
+                                tabindex="2"
+                            />
                         </div>
-                        <div class="text-center mt-2">
-                            <span class="text-lg font-bold text-gray-900">
-                                {{ number_format(($group->current_amount / $group->target_amount) * 100, 1) }}% Complete
-                            </span>
-                        </div> -->
+                        <div class="share-calculator">
+                            <p>Your weekly contribution:</p>
+                            <p class="total-amount" id="weekly-contribution">${{ number_format($portalSet->share_price ?? 0, 2) }}</p>
+                            <p class="mt-1">Total 52-week investment:</p>
+                            <p class="total-amount" id="total-investment">${{ number_format(($portalSet->share_price ?? 0) * 52, 2) }}</p>
+                        </div>
                     </div>
 
                     <!-- Video Section -->
@@ -257,23 +329,57 @@
     </div>
 
     <script>
-        function registerNow(id) {
-            let url = "{{ route('user.register', ':id') }}";
-            url = url.replace(':id', id);
-            window.location.href = url;
-        }
+  function registerNow(id) {
+    const shareCount = document.getElementById('share').value;
+    
+    // Validate share count
+    if (!shareCount || shareCount < 1) {
+        alert('Please enter a valid number of shares (minimum 1)');
+        return;
+    }
+    
+    // Construct URL with ID as route parameter and shares as query parameter
+    let baseUrl = "{{ route('user.register', ':id') }}";
+    let url = baseUrl.replace(':id', id) + '?shares=' + encodeURIComponent(shareCount);
+    
+    window.location.href = url;
+}
+        //  function registerNow(id) {
+        //     let url = "{{ route('user.register', ':id') }}";
+        //     url = url.replace(':id', id);
+        //     window.location.href = url;
+        // }
 
-
-        // Add some interactive effects
+        // Calculate investment amounts based on share count
         document.addEventListener('DOMContentLoaded', function () {
-            const progressBar = document.querySelector('.bg-gradient-to-r');
-            const originalWidth = progressBar.style.width;
-            progressBar.style.width = '0%';
+            const shareInput = document.getElementById('share');
+            const weeklyContribution = document.getElementById('weekly-contribution');
+            const totalInvestment = document.getElementById('total-investment');
+            const sharePrice = {{ $portalSet->share_price ?? 0 }};
 
-            setTimeout(() => {
-                progressBar.style.transition = 'width 2s ease-in-out';
-                progressBar.style.width = originalWidth;
-            }, 500);
+            function updateCalculations() {
+                const shares = parseInt(shareInput.value) || 1;
+                const weeklyAmount = shares * sharePrice;
+                const totalAmount = weeklyAmount * 52;
+                
+                weeklyContribution.textContent = '$' + weeklyAmount.toFixed(2);
+                totalInvestment.textContent = '$' + totalAmount.toFixed(2);
+            }
+
+            shareInput.addEventListener('input', updateCalculations);
+            updateCalculations(); // Initialize with default values
+
+            // Add some interactive effects
+            const progressBar = document.querySelector('.bg-gradient-to-r');
+            if (progressBar) {
+                const originalWidth = progressBar.style.width;
+                progressBar.style.width = '0%';
+
+                setTimeout(() => {
+                    progressBar.style.transition = 'width 2s ease-in-out';
+                    progressBar.style.width = originalWidth;
+                }, 500);
+            }
 
             // Add hover effects to cards
             const cards = document.querySelectorAll('.glass-card');

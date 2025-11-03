@@ -12,6 +12,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Str;
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
 
 class AdminController extends Controller
 {
@@ -20,7 +22,7 @@ class AdminController extends Controller
      */
     public function index()
     {
-       $portalSet = PortalSet::where('isFull', 1)->first();
+       $portalSet = PortalSet::where('isFull', 0)->first();
 
         $groups = Group::with('leader')->where('portal_set_id',$portalSet->id)->latest()->paginate(10);
         return view("admin.groups.index", compact("groups"));
@@ -177,5 +179,45 @@ class AdminController extends Controller
         }
         return redirect()->back()->with('success', 'Assign member successfully');
 
+    }
+     public function checkout()
+    {
+        return view('test');
+    }
+
+    public function session(Request $request)
+    {
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $session = Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => [
+                [
+                    'price_data' => [
+                        'currency' => 'usd',
+                        'product_data' => [
+                            'name' => 'Sample Product',
+                        ],
+                        'unit_amount' => 2000, // $20.00
+                    ],
+                    'quantity' => 1,
+                ]
+            ],
+            'mode' => 'payment',
+            'success_url' => route('admin.stripe.success'),
+            'cancel_url' => route('admin.stripe.cancel'),
+        ]);
+
+        return redirect($session->url);
+    }
+
+    public function success()
+    {
+        return 'Payment Successful!';
+    }
+
+    public function cancel()
+    {
+        return 'Payment Cancelled!';
     }
 }

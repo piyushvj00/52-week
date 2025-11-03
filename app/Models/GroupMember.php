@@ -14,6 +14,7 @@ class GroupMember extends Model
         'payout_order',
         'user_id',
         'group_id',
+        'share'
     ];
     public function member(){
         return $this->belongsTo(User::class,'user_id');

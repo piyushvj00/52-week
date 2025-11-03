@@ -24,37 +24,37 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $portalSet = PortalSet::where('isFull', 1)->first();
-
-        $groupCount = $portalSet ? Group::where('portal_set_id', $portalSet->id)->count() : 0;
+        $portalSet = PortalSet::where('isFull', 0)->first();
         $groupIds = $portalSet ? Group::where('portal_set_id', $portalSet->id)->pluck('id') : collect();
+        $groupCount = $portalSet ? Group::where('portal_set_id', $portalSet->id)->count() : 0;
         $groupMember = $groupIds->isNotEmpty() ? GroupMember::whereIn('group_id', $groupIds)->count() : 0;
         $contribution = $groupIds->isNotEmpty() ? (float) (Contribution::whereIn('group_id', $groupIds)->sum('amount') ?? 0) : 0;
 
+        $startDate = Carbon::parse($portalSet->start_date);
+        $endDate = Carbon::parse($portalSet->end_date);
+
+        $totalWeeks = ceil($startDate->diffInDays($endDate) / 7);
+
+        $weekLabels = [];
         $weeklyContributions = [];
         $weeklyRevenue = [];
-        $weekLabels = [];
 
-        for ($i = 3; $i >= 0; $i--) {
-            $weekStart = now()->subWeeks($i)->startOfWeek();
-            $weekEnd = now()->subWeeks($i)->endOfWeek();
-            $weekNumber = now()->subWeeks($i)->week;
+        for ($i = 1; $i <= $totalWeeks; $i++) {
 
-            $weekContributions = $groupIds->isNotEmpty() ?
-                Contribution::whereIn('group_id', $groupIds)
-                    ->whereBetween('contribution_date', [$weekStart, $weekEnd])
-                    ->sum('amount') : 0;
+            $weekStart = $startDate->copy()->addDays(($i - 1) * 7);
+            $weekEnd = $startDate->copy()->addDays($i * 7 - 1);
 
-            $weekRevenue = $groupIds->isNotEmpty() ?
-                Transaction::whereIn('group_id', $groupIds)
-                    ->whereBetween('paid_date', [$weekStart, $weekEnd])
-                    ->sum('payout_amount') : 0;
+            $weekContributions = Contribution::whereBetween('contribution_date', [$weekStart, $weekEnd])
+                ->sum('amount');
+
+            $weekRevenue = Transaction::whereBetween('paid_date', [$weekStart, $weekEnd])
+                ->sum('payout_amount');
 
             $weeklyContributions[] = (float) $weekContributions;
             $weeklyRevenue[] = (float) $weekRevenue;
-            $weekLabels[] = 'Week ' . $weekNumber;
-        }
 
+            $weekLabels[] = "Week " . $i;
+        }
         // Member Status Data
         $activeMembers = $groupIds->isNotEmpty() ?
             GroupMember::whereIn('group_id', $groupIds)->where('is_active', true)->count() : 0;
@@ -168,7 +168,7 @@ class DashboardController extends Controller
             ->sortByDesc('time')
             ->take(6); // Limit to 6 most recent activities
 
-            $latestLeader = Group::with('user')->latest()->first(); 
+        $latestLeader = Group::with('user')->latest()->first();
 
         return view('admin.dashboard.index', compact(
             'groupCount',

@@ -284,7 +284,7 @@
                                 <div class="group-card">
                                     <div class="group-card-header">
                                         <div class="group-card-title">
-                                            <span>{{ $group->name ?? 'Unnamed Group' }}</span>
+                                            <span>{{ $groups->name ?? 'Unnamed Group' }}</span>
                                             <span class="group-number">#{{ $groups->group_number }}</span>
                                         </div>
                                         @if($groups->project_name)

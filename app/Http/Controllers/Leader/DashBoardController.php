@@ -18,98 +18,99 @@ class DashBoardController extends Controller
 
     public function dashboard()
     {
-    $portalSet = PortalSet::where('isFull', 1)->first();
-    $group = Group::where('leader_id', auth()->user()->id)->first();
-    
-    if (!$group) {
-        $groupMember = 0;
-        $contribution = 0;
+        $portalSet = PortalSet::where('isFull', 01)->first();
+        $group = Group::where('leader_id', auth()->user()->id)->first();
+
+        if (!$group) {
+            $groupMember = 0;
+            $contribution = 0;
+            $weeklyContributions = [];
+            $memberDistribution = [];
+            $weekLabels = [];
+
+            return view("leader.dashboard", compact(
+                'portalSet',
+                'contribution',
+                'groupMember',
+                'weeklyContributions',
+                'memberDistribution',
+                'weekLabels'
+            ));
+        }
+
+        $groupMember = GroupMember::where('group_id', $group->id)->count() ?? 0;
+        $contribution = Contribution::where('group_id', $group->id)->sum('amount') ?? 0;
+
+        // Contribution Trends Data (Last 7 weeks)
         $weeklyContributions = [];
-        $memberDistribution = [];
         $weekLabels = [];
-        
+
+        for ($i = 6; $i >= 0; $i--) {
+            $weekStart = now()->subWeeks($i)->startOfWeek();
+            $weekEnd = now()->subWeeks($i)->endOfWeek();
+            $weekNumber = now()->subWeeks($i)->week;
+
+            $weekContribution = Contribution::where('group_id', $group->id)
+                ->where('status', 'completed')
+                ->whereBetween('contribution_date', [$weekStart, $weekEnd])
+                ->sum('amount');
+
+            $weeklyContributions[] = (float) $weekContribution;
+            $weekLabels[] = 'Week ' . $weekNumber;
+        }
+
+        // Member Distribution Data
+        $activeMembers = GroupMember::where('group_id', $group->id)
+            ->where('is_active', true)
+            ->count();
+
+        $pendingMembers = GroupMember::where('group_id', $group->id)
+            ->where('is_active', false)
+            ->count();
+
+        $completedMembers = GroupMember::where('group_id', $group->id)
+            ->where('has_recived', true)
+            ->count();
+
+        $memberDistribution = [
+            'active' => $activeMembers,
+            'pending' => $pendingMembers,
+            'completed' => $completedMembers
+        ];
+
+        // Additional stats for the dashboard
+        $totalTarget = $group->target_amount;
+        $completionPercentage = $totalTarget > 0 ? ($contribution / $totalTarget) * 100 : 0;
+        $weeksRemaining = $portalSet ? now()->diffInWeeks($portalSet->end_date) : 0;
+
         return view("leader.dashboard", compact(
-            'portalSet', 
-            'contribution', 
+            'portalSet',
+            'contribution',
             'groupMember',
+            'group',
             'weeklyContributions',
             'memberDistribution',
-            'weekLabels'
+            'weekLabels',
+            'totalTarget',
+            'completionPercentage',
+            'weeksRemaining'
         ));
     }
 
-    $groupMember = GroupMember::where('group_id', $group->id)->count() ?? 0;
-    $contribution = Contribution::where('group_id', $group->id)->sum('amount') ?? 0;
+    public function xyz()
+    {
 
-    // Contribution Trends Data (Last 7 weeks)
-    $weeklyContributions = [];
-    $weekLabels = [];
-    
-    for ($i = 6; $i >= 0; $i--) {
-        $weekStart = now()->subWeeks($i)->startOfWeek();
-        $weekEnd = now()->subWeeks($i)->endOfWeek();
-        $weekNumber = now()->subWeeks($i)->week;
-        
-        $weekContribution = Contribution::where('group_id', $group->id)
-            ->where('status', 'completed')
-            ->whereBetween('contribution_date', [$weekStart, $weekEnd])
-            ->sum('amount');
-        
-        $weeklyContributions[] = (float) $weekContribution;
-        $weekLabels[] = 'Week ' . $weekNumber;
-    }
-
-    // Member Distribution Data
-    $activeMembers = GroupMember::where('group_id', $group->id)
-        ->where('is_active', true)
-        ->count();
-
-    $pendingMembers = GroupMember::where('group_id', $group->id)
-        ->where('is_active', false)
-        ->count();
-
-    $completedMembers = GroupMember::where('group_id', $group->id)
-        ->where('has_recived', true)
-        ->count();
-
-    $memberDistribution = [
-        'active' => $activeMembers,
-        'pending' => $pendingMembers,
-        'completed' => $completedMembers
-    ];
-
-    // Additional stats for the dashboard
-    $totalTarget = $group->target_amount;
-    $completionPercentage = $totalTarget > 0 ? ($contribution / $totalTarget) * 100 : 0;
-    $weeksRemaining = $portalSet ? now()->diffInWeeks($portalSet->end_date) : 0;
-
-    return view("leader.dashboard", compact(
-        'portalSet', 
-        'contribution', 
-        'groupMember',
-        'group',
-        'weeklyContributions',
-        'memberDistribution',
-        'weekLabels',
-        'totalTarget',
-        'completionPercentage',
-        'weeksRemaining'
-    ));
-}
-
-     public function xyz()  {
-        
         $groups = PortalSet::with('groups')->get();
-        
+
         dd($groups);
 
-     }
+    }
     public function group()
     {
         $groups = Group::where('leader_id', auth()->user()->id)->first();
         // dd($groups);
         $member = User::where('role', 3)->latest()->get();
-        $portalSet = PortalSet::where('id', $groups->portal_set_id )->first();
+        $portalSet = PortalSet::where('id', $groups->portal_set_id)->first();
 
         // other needed variables
 
@@ -118,7 +119,7 @@ class DashBoardController extends Controller
         // dd($groups->where('is_active',true AND 'portal_set_id', $groups->portal_set_id)->count());
 
 
-        return view('leader.group.index', compact('groups', 'member','portalSet','portalGroupCount'));
+        return view('leader.group.index', compact('groups', 'member', 'portalSet', 'portalGroupCount'));
     }
     public function groupCreate()
     {
@@ -139,7 +140,7 @@ class DashBoardController extends Controller
         $groupMember->user_id = $request->user_id;
         $groupMember->group_id = $request->group_id;
         $groupMember->weekly_commitment = $request->weekly_commitment;
-        $shares = ($group->target_amount)/($request->weekly_commitment);
+        $shares = ($group->target_amount) / ($request->weekly_commitment);
         $groupMember->group_sare = $shares;
         $groupMember->save();
         return redirect()->back()->with('success', 'Member  assign successfully');
@@ -237,39 +238,41 @@ class DashBoardController extends Controller
         $group->project_name = $request->project_name;
         $group->save();
         return redirect()->route('leader.group')->with('success', 'Group Updated successsfully');
-
-
     }
 
     public function contribution()
-    {        $groups = Group::where('leader_id', auth()->user()->id)->latest()->paginate(10);
+    {
+        $groups = Group::where('leader_id', auth()->user()->id)->latest()->paginate(10);
         $member = User::where('role', 3)->latest()->get();
-        return view('leader.contribution.index',compact('groups','member'));
+        return view('leader.contribution.index', compact('groups', 'member'));
     }
-    public function readAllNotification(Request $request){
+    public function readAllNotification(Request $request)
+    {
 
-      Notification::where('receiver_id', Auth::id())
-                    ->where('is_read', false)
-                    ->update(['is_read' => true]);
+        Notification::where('receiver_id', Auth::id())
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
 
         return redirect()->back(); // or return JSON if using AJAX
 
-}
+    }
 
-    public function contributionList($id){
+    public function contributionList($id)
+    {
 
-    
-     $contribution = Contribution::with('group', 'user')->where('group_id',$id)->latest()->paginate(10)->through(function ($data) {
-        $contr = GroupMember::where('group_id', $data->group_id)
-            ->where('user_id', $data->user_id)
-            ->first();
 
-        $data->contributionamount = $contr ? $contr->weekly_commitment : 0;
-        return $data;
-    });
+        $contribution = Contribution::with('group', 'user')->where('group_id', $id)->latest()->paginate(10)->through(function ($data) {
+            $contr = GroupMember::where('group_id', $data->group_id)
+                ->where('user_id', $data->user_id)
+                ->first();
+
+            $data->contributionamount = $contr ? $contr->weekly_commitment : 0;
+            return $data;
+        });
         return view('leader.contribution.list', compact('contribution'));
-}
- public function contributionStatus(Request $request){
+    }
+    public function contributionStatus(Request $request)
+    {
         $contribution = Contribution::find($request->id);
         $contribution->status = $request->status;
         $contribution->save();
