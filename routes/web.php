@@ -29,7 +29,10 @@ use App\Http\Controllers\User\DashBoardController as UserDashBoardController;
 // });
 // Route for the user login to web page
 Route::get('/', [UserAuthController::class, 'register'])->name('user.register');
-Route::get('/test', [UserAuthController::class, 'test']);
+    Route::get('/test', [AdminController::class, 'checkout'])->name('admin.stripe.checkout');
+Route::post('/session', [AdminController::class, 'session'])->name('admin.stripe.session');
+Route::get('/success', [UserDashBoardController::class, 'stripeSuccess'])->name('admin.stripe.success');
+Route::get('/cancel', [UserDashBoardController::class, 'stripeCancel'])->name('admin.stripe.cancel');
 
 // All Routes for the admin(role - 1) -------------------------------------------------------------
 

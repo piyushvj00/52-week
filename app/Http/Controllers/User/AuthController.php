@@ -19,26 +19,41 @@ use Illuminate\Support\Facades\Session;
 class AuthController extends Controller
 {
 
-    public function register(Request $request)
+    public function register(Request $request, $id = null)
     {
+        // Get the shares from query parameter
+        $shares = $request->query('shares', 1);
+
+        if ($id) {
+            $group = Group::find($id);
+            if ($group) {
+                $portalSet = PortalSet::find($group->portal_set_id);
+                return view('user.compney-data', compact('group', 'portalSet', 'shares'));
+            }
+        }
         $key = array_key_first($request->all());
         $invite_link = Group::find($key);
         $link = null;
+
         if ($invite_link) {
             $link = $invite_link->invite_link;
         }
 
         if ($request['link']) {
             $group = Group::where('invite_link', $request['link'])->first();
-            $portalSet = PortalSet::find($group->portal_set_id);
-            return view('user.compney-data', compact('group', 'portalSet'));
+            if ($group) {
+                $portalSet = PortalSet::find($group->portal_set_id);
+                return view('user.compney-data', compact('group', 'portalSet', 'shares'));
+            }
         }
-        return view("user.register", compact('link'));
+
+        return view("user.register", compact('link', 'shares'));
     }
 
     public function registerStore(StoreUserRequest $request)
     {
         try {
+            dd($request->All());
             DB::beginTransaction();
             $user = new User();
             $user->name = $request->name;
@@ -53,7 +68,7 @@ class AuthController extends Controller
                 $groupMember->user_id = $user->id;
                 $groupMember->group_id = $group->id;
                 $groupMember->weekly_commitment = $group->target_amount;
-                $groupMember->group_sare = 0;
+                $groupMember->group_sare = $request->share;
                 $groupMember->save();
             }
 
@@ -166,6 +181,7 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
+
         $user = User::where('email', $request->email)->first();
 
 
@@ -202,14 +218,7 @@ class AuthController extends Controller
     }
     public function test()
     {
-        $arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        $rev = [];
-
-        for ($i = count($arr) - 1; $i >= 0; $i--) {
-            $rev[] = $arr[$i];
-        }
-
-        dd($rev);
+        return view('test');
 
     }
 }

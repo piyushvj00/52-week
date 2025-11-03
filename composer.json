@@ -10,7 +10,8 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
-        "orhanerday/open-ai": "^5.3"
+        "orhanerday/open-ai": "^5.3",
+        "stripe/stripe-php": "^18.1"
     },
     
     "require-dev": {

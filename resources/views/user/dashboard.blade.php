@@ -271,12 +271,20 @@
         <div class="content-header row"></div>
         <div class="content-body">
             
-           @php
-                use Carbon\Carbon;
-                $startDate = Carbon::parse($portal->start_date);
-                $endDate = Carbon::parse($portal->end_date);
-                $weekNumber = weekCount($startDate);                
-        @endphp
+                        @php
+                    use Carbon\Carbon;
+
+                    $startDate = $portal && $portal->start_date 
+                        ? Carbon::parse($portal->start_date) 
+                        : null;
+
+                    $endDate = $portal && $portal->end_date 
+                        ? Carbon::parse($portal->end_date) 
+                        : null;
+
+                    $weekNumber = $startDate ? weekCount($startDate) : '';
+                @endphp
+
 
             <!-- Group Header -->
             <div class="group-header">
@@ -294,11 +302,25 @@
             </div>
 
             <!-- Progress Section -->
-            @php
-                $totalWeeks = $startDate->diffInWeeks($endDate);
-                $weeksCompleted = min($weekNumber, $totalWeeks);
-                $progressPercentage = $totalWeeks > 0 ? ($weeksCompleted / $totalWeeks) * 100 : 0;
+           @php
+    // Defaults
+                $totalWeeks = 0;
+                $weeksCompleted = 0;
+                $progressPercentage = 0;
+
+                if ($startDate && $endDate) {
+                    $totalWeeks = $startDate->diffInWeeks($endDate);
+
+                    // Avoid week count 0 making division issues
+                    $weekNumber = $weekNumber ?? 0;
+                    $totalWeeks = max($totalWeeks, 1); 
+
+                    $weeksCompleted = min($weekNumber, $totalWeeks);
+
+                    $progressPercentage = ($weeksCompleted / $totalWeeks) * 100;
+                }
             @endphp
+
             <div class="progress-section">
                 <div class="row align-items-center">
                     <div class="col-md-8">
@@ -371,7 +393,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="stat-value">{{ $startDate->format('M j y') ?? 'N/A' }}</div>
+                                            <div class="stat-value">{{ $startDate ? $startDate->format('M j y') : 'N/A' }}</div>
                                             <div class="stat-label">Start Date</div>
                                             <div class="stat-trend trend-up">
                                                 <i data-feather="clock"></i> Portal Start
@@ -391,7 +413,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="stat-value">{{ $endDate->format('M j y') ?? 'N/A' }}</div>
+                                            <div class="stat-value">{{ $endDate ? $endDate ->format('M j y') : 'N/A' }}</div>
                                             <div class="stat-label">End Date</div>
                                             <div class="stat-trend trend-down">
                                                 <i data-feather="alert-circle"></i> Portal End
@@ -466,7 +488,7 @@
                                     </div>
                                     <div class="activity-content">
                                         <div class="activity-title">New Member</div>
-                                        <div class="activity-description">A new member name {{  $groupMembers[0]->name}} joined the group</div>
+                                        <div class="activity-description">A new member name {{  $groupMembers[0]->name ?? ''}} joined the group</div>
                                         @if( count( $groupMembers)>0)
                                             <div class="activity-time">{{ \Carbon\Carbon::parse($groupMembers[0]->created_at)->diffForHumans()}}</div>
                                         @else
@@ -509,7 +531,7 @@
                                         <div class="stat-label">You Contributed</div>
                                     </div>
                                     <div class="col-6 mb-4">
-                                        <div class="stat-value text-warning">${{ $portal->target_amount }}</div>
+                                        <div class="stat-value text-warning">${{ $portal->target_amount ?? '' }}</div>
                                         <div class="stat-label">Group's Week Target</div>
                                     </div>
                                     <div class="col-6 mb-4">
