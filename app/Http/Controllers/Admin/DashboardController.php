@@ -10,6 +10,7 @@ use App\Models\Ebook;
 use App\Models\Group;
 use App\Models\HelpSupport;
 use App\Models\GroupMember;
+use App\Models\LeaderBankdetails;
 use App\Models\News;
 use App\Models\PortalSet;
 use App\Models\Transaction;
@@ -263,5 +264,13 @@ class DashboardController extends Controller
                 ->withInput()
                 ->with('error', 'Failed to update support settings. Please try again.');
         }
+    }
+
+    public function leaderAccDetails($leader_id)  {
+
+        $leader = User::where('id', $leader_id)->first();
+        $bankDetails = LeaderBankdetails::where('leader_id',$leader_id)->first();
+
+        return view('admin.users.bankDetails' , compact('leader' , 'bankDetails'));
     }
 }

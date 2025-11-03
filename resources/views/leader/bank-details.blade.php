@@ -121,16 +121,18 @@
                     </div>
 
                     <div class="form-section">
-                        <form id="bankDetailsForm">
+                        <form  action="{{ route('leader.bank.details') }}" method="post" enctype="multipart/form-data"
+>
+                            @csrf
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-3">
                                     <label for="fullName" class="form-label required-field">Your Full Name (as on account)</label>
-                                    <input type="text" class="form-control" id="fullName" placeholder="Enter your full name as it appears on your bank account" required>
+                                    <input type="text" class="form-control" id="fullName" name="bank_holder_name" placeholder="Enter your full name as it appears on your bank account" value="{{ $bankDetails->bank_holder_name }}" required>
                                     <div class="example-text">Example: John David Smith</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="bankName" class="form-label required-field">Bank Name</label>
-                                    <input type="text" class="form-control" id="bankName" placeholder="Enter your bank's name" required>
+                                    <input type="text" class="form-control" id="bankName" placeholder="Enter your bank's name" name="bank_name" value="{{ $bankDetails->bank_name }}" required>
                                     <div class="example-text">Example: Bank of America, Chase, Wells Fargo</div>
                                 </div>
                             </div>
@@ -138,7 +140,7 @@
                             <div class="row mb-4">
                                 <div class="col-12 mb-3">
                                     <label for="bankAddress" class="form-label required-field">Bank Address (Main Branch or Your Branch)</label>
-                                    <textarea class="form-control" id="bankAddress" rows="3" placeholder="Enter your bank's complete address" required></textarea>
+                                    <textarea class="form-control" id="bankAddress" rows="3" name="bank_address"  required>{{  $bankDetails->bank_address ?? "Enter your bank's complete address" }}</textarea>
                                     <div class="example-text">Example: 123 Main Street, New York, NY 10001, United States</div>
                                 </div>
                             </div>
@@ -146,12 +148,12 @@
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-3">
                                     <label for="accountNumber" class="form-label required-field">Account Number</label>
-                                    <input type="text" class="form-control" id="accountNumber" placeholder="Enter your bank account number" required>
+                                    <input type="text" class="form-control" id="accountNumber" name="account_number" placeholder="Enter your bank account number" value="{{ $bankDetails->account_number }}">
                                     <div class="example-text">Example: 123456789012</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="routingNumber" class="form-label required-field">Routing Number (ABA)</label>
-                                    <input type="text" class="form-control" id="routingNumber" placeholder="Enter your bank's routing number" required>
+                                    <input type="text" class="form-control" id="routingNumber" name="routing_number" placeholder="Enter your bank's routing number" value="{{ $bankDetails->routing_number }}">
                                     <div class="example-text">Example: 021000021 (9-digit code)</div>
                                 </div>
                             </div>
@@ -159,12 +161,12 @@
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-3">
                                     <label for="swiftCode" class="form-label required-field">SWIFT/BIC Code of Your Bank</label>
-                                    <input type="text" class="form-control" id="swiftCode" placeholder="Enter your bank's SWIFT/BIC code" required>
+                                    <input type="text" class="form-control" id="swiftCode" name="swift_code" placeholder="Enter your bank's SWIFT/BIC code" value="{{ $bankDetails->swift_code }}">
                                     <div class="example-text">Example: BOFAUS3N (for Bank of America)</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="accountType" class="form-label required-field">Account Type</label>
-                                    <select class="form-select" id="accountType" required>
+                                    <select class="form-select" id="accountType"  name="account_type">
                                         <option value="" selected disabled>Select your account type</option>
                                         <option value="checking">Checking Account</option>
                                         <option value="savings">Savings Account</option>
@@ -176,7 +178,7 @@
                             <div class="row mb-4">
                                 <div class="col-12 mb-3">
                                     <label for="additionalDetails" class="form-label">Additional Payment Details</label>
-                                    <textarea class="form-control" id="additionalDetails" rows="4" placeholder="Provide any additional payment information (e.g., PayPal email, other payment methods, special instructions)"></textarea>
+                                    <textarea class="form-control" name="payment_details" id="additionalDetails" rows="4" >{{ $bankDetails->payment_details ?? "Provide any additional payment information (e.g., PayPal email, other payment methods, special instructions)" }} </textarea>
                                     <div class="example-text">Example: PayPal: your.email@example.com, or any other payment platforms you use</div>
                                 </div>
                             </div>

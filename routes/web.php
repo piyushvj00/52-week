@@ -62,6 +62,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
   Route::get('/help-support', [DashboardController::class, 'helpSupport'])->name('admin.help.support');
   Route::post('/support-settings', [DashBoardController::class, 'helpSupportStore'])->name('admin.support.settings.update');
 
+  Route::get('/bank-details{leader_id}',[DashboardController::class , 'leaderAccDetails'])->name('admin.account.details');
+
 });
 
 // All routes for the leader(role - 2) -------------------------------------------------------------
@@ -100,6 +102,7 @@ Route::prefix('leader')->group(function () {
 
   // for bank details to admin
   Route::get("bank-details", [LeaderDashBoardController::class, 'bankDetails'])->name('leader.bank.details');
+  Route::post("bank-details", [LeaderDashBoardController::class, 'bankDetailsStore'])->name('leader.bank.details');
   Route::get('/logout', [MemberController::class, 'logout'])->name('leader.logout');
 
   });

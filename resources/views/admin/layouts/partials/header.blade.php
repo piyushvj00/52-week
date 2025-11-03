@@ -165,6 +165,16 @@
             backdrop-filter: blur(10px);
             background: rgba(255, 255, 255, 0.95);
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        } 
+        
+        .tagline h2{
+            font-size: 14px;
+            color: #000;
+            margin-bottom: 0px;
+        }
+        .tagline {
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>
@@ -192,6 +202,10 @@
     <!-- BEGIN: Header -->
     <nav class="header-navbar navbar navbar-expand-lg align-items-center floating-nav navbar-light navbar-shadow container-xxl">
         <div class="navbar-container d-flex content">
+            <div class="tagline">
+                <h2>Lorem ipsum dolor sit amet consectetur, adipisicing elit</h2>
+
+            </div>
             <ul class="nav navbar-nav align-items-center ms-auto">
 
                 <!-- Notifications -->

@@ -253,6 +253,7 @@
                                     <th>Contact</th>
                                     <th>Joined Date</th>
                                     <th>Status</th>
+                                    <th>Bank Detail</th>
                                     <th width="120">Actions</th>
                                 </tr>
                             </thead>
@@ -297,6 +298,13 @@
                                             <span class="status-badge {{ $val->status == 1 ? 'status-active' : 'status-inactive' }}">
                                                 {{ $val->status == 1 ? 'Active' : 'Inactive' }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('admin.account.details' , $val->id) }}">
+                                                <span class="status-badge status-active">
+                                                    Bank's Data
+                                                </span>
+                                            </a>
                                         </td>
                                         <td>
                                             <div class="action-buttons">

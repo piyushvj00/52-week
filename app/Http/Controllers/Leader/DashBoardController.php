@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Contribution;
 use App\Models\Group;
 use App\Models\GroupMember;
+use App\Models\LeaderBankdetails;
 use App\Models\Notification;
 use App\Models\PortalSet;
 use App\Models\User;
@@ -281,7 +282,37 @@ class DashBoardController extends Controller
 
     public function bankDetails()
     {
-        return view('leader.bank-details');
+        $bankDetails = LeaderBankdetails::where('leader_id', auth()->id())->first();
+        return view('leader.bank-details', compact('bankDetails'));
+    }
+
+    public function bankDetailsStore(Request $request) {
+        $leader = Auth::user();
+        $group = Group::where('leader_id', $leader->id)->first();
+
+        $request->validate([
+        'bank_holder_name' => 'required|string|max:255',
+        'bank_name'        => 'required|string|max:255',
+        'bank_address'     => 'nullable|string|max:500',
+        ]);
+
+        LeaderBankdetails::updateOrCreate([
+        'leader_id'          => $leader->id,
+        'bank_holder_name' => $request->bank_holder_name,
+        'bank_name'        => $request->bank_name,
+        'bank_address'     => $request->bank_address,
+        'account_number'   => $request->account_number,
+        'routing_number'   => $request->routing_number,
+        'swift_code'       => $request->swift_code,
+        'account_type'     => $request->account_type,
+        'payment_details'  => $request->payment_details,
+        'portal_set_id' => $group->portal_set_id,
+        'group_id' => $group->id
+        ]);
+
+        return redirect()->back()->with('success', 'Bank details saved successfully!');
+        
+
     }
 
 
