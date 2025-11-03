@@ -85,6 +85,18 @@ ease;
                 </a>
             </li>
 
+            <!-- Account detail to admin -->
+            <li class="nav-item">
+                <a class="d-flex align-items-center {{ request()->routeIs('leader.bank.details') ? 'active' : '' }}"
+                   href="{{ route('leader.bank.details') }}">
+                    <div class="menu-icon-wrapper">
+                        <i data-feather="file-text" class="menu-icon ms-1"></i>
+                    </div>
+                    <span class="menu-title text-truncate">Bank Details</span>
+                    <span class="menu-badge badge bg-light-warning">To Admin</span>
+                </a>
+            </li>
+
             <!-- Quick Stats Section -->
             <li class="navigation-header mt-4">
                 <span class="navigation-header-text">Group Stats</span>

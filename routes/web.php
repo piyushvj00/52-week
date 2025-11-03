@@ -97,6 +97,9 @@ Route::prefix('leader')->group(function () {
     Route::post('/real-all', [LeaderDashBoardController::class, 'readAllNotification'])->name('leader.notifications.markAllRead');
   Route::get('/contribution/list/{id}', [LeaderDashBoardController::class, 'contributionList'])->name('leader.contribution.list');
   Route::post('/contribution/status', [MemberController::class, 'contributionStatus'])->name('leader.contribution.status');
+
+  // for bank details to admin
+  Route::get("bank-details", [LeaderDashBoardController::class, 'bankDetails'])->name('leader.bank.details');
   Route::get('/logout', [MemberController::class, 'logout'])->name('leader.logout');
 
   });
