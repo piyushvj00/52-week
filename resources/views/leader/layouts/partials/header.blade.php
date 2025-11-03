@@ -282,7 +282,7 @@
                             <i class="me-50" data-feather="user"></i>
                             <span>Profile</span>
                         </a>
-                        <a class="dropdown-item" href="{{ route('logout') }}">
+                        <a class="dropdown-item" href="{{ route('leader.logout') }}">
                             <i class="me-50" data-feather="power"></i>
                             <span>Logout</span>
                         </a>

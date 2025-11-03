@@ -62,7 +62,7 @@ ease;
             </li>
              @php
               $user = Auth::user();
-              $groupId = \App\Models\GroupMember::where('user_id',$user->id)->first()->group_id;
+              $groupId = \App\Models\GroupMember::where('user_id',$user->id)->first()->group_id ?? 0;
             @endphp
 
             <!-- Group Details -->

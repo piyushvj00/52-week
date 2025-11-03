@@ -14,8 +14,8 @@ return [
     |
     */
     'openai' => [
-    'api_key' => env('OPENAI_API_KEY'),
-],
+        'api_key' => env('OPENAI_API_KEY'),
+    ],
 
 
     'mailgun' => [
@@ -34,5 +34,10 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+    ],
+
 
 ];

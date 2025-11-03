@@ -77,7 +77,7 @@ class LeaderController extends Controller
                 $videoPath = $request->file('video')->store('portal-videos', 'public');
             }
 
-            $portalSet = PortalSet::where('isFull', 1)->first();
+            $portalSet = PortalSet::where('isFull', 0)->first();
 
 
             Group::where('portal_set_id', $portalSet->id)
