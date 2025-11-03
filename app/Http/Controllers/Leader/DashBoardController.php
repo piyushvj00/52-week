@@ -275,4 +275,11 @@ class DashBoardController extends Controller
         $contribution->save();
         return response()->json($contribution->status);
     }
+
+    public function bankDetails()
+    {
+        return view('leader.bank-details');
+    }
+
+
 }
