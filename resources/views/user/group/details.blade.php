@@ -1,5 +1,5 @@
-            @extends('user.layouts.main')
- 
+@extends('user.layouts.main')
+
 @section('title', 'Group Details')
 <style>
     .dashboard-card {
@@ -153,6 +153,31 @@
         font-weight: 600;
         font-size: 0.9rem;
     }
+    .member-dropdown {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .vision-section {
+        background: #f8f9ff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 15px;
+    }
+    .vision-title {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 10px;
+    }
+    .vision-content {
+        color: #2d3748;
+        line-height: 1.6;
+    }
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
     @media (max-width: 768px) {
         .stats-card {
             margin-bottom: 15px;
@@ -170,9 +195,18 @@
         <div class="content-header row"></div>
         <div class="content-body">
             @php
-                $currentWeek  = WeekCount($portal->start_date);
+                use Carbon\Carbon;
+                $currentWeek = $portal ? WeekCount($portal->start_date) : 1;
+                
+                // Calculate total weeks
+                $totalWeeks = 0;
+                if ($portal && $portal->start_date && $portal->end_date) {
+                    $start = Carbon::parse($portal->start_date)->startOfDay();
+                    $end = Carbon::parse($portal->end_date)->startOfDay();
+                    $diffDays = $start->diffInDays($end);
+                    $totalWeeks = floor(($diffDays + 1) / 7);
+                }
             @endphp
-
 
             <!-- Progress Section -->
             <div class="progress-section">
@@ -192,13 +226,13 @@
                         <div class="progress-container">
                             <div class="d-flex justify-content-between text-white mb-2">
                                 <span>Progress</span>
-                                <span>{{ $group->target_amount > 0 ? round(($group->current_amount / $group->target_amount) * 100, 1) : 0 }}%</span>
+                                <span>{{ $group && $group->target_amount > 0 ? round(($group->current_amount / $group->target_amount) * 100, 1) : 0 }}%</span>
                             </div>
                             <div class="progress-bar-custom">
-                                <div class="progress-fill" style="width: {{ $group->target_amount > 0 ? ($group->current_amount / $group->target_amount) * 100 : 0 }}%"></div>
+                                <div class="progress-fill" style="width: {{ $group && $group->target_amount > 0 ? ($group->current_amount / $group->target_amount) * 100 : 0 }}%"></div>
                             </div>
                             <div class="text-white mt-2 text-center">
-                                ${{ number_format($group->current_amount, 2) }} / ${{ number_format($group->target_amount, 2) }}
+                                ${{ number_format($group->current_amount ?? 0, 2) }} / ${{ number_format($group->target_amount ?? 0, 2) }}
                             </div>
                         </div>
                     </div>
@@ -213,52 +247,45 @@
                             <h4 class="card-title text-white mb-0">Quick Review</h4>
                         </div>
                         <div class="card-body">
-                            <div class="row align-items-center">
+                            <div class="row">
                                 <div class="col-md-6">
+                                    <div class="info-item">
+                                        <div class="info-label">Share Price</div>
+                                        <div class="info-value">${{ number_format($portal->share_price ?? 0, 2) }}</div>
+                                    </div>
                                     <div class="info-item">
                                         <div class="info-label">Weekly Commitment</div>
                                         <div class="info-value">${{ number_format($weeklyCommitment ?? 0, 2) }}</div>
                                     </div>
                                     <div class="info-item">
+                                        <div class="info-label">Total Investment</div>
+                                        <div class="info-value">${{ number_format($totalInvestment ?? 0, 2) }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- <div class="info-item">
+                                        <div class="info-label">Share Commitment</div>
+                                        <div class="info-value">{{ $groupShare ?? 0 }} Shares</div>
+                                    </div> -->
+                                    <div class="info-item">
                                         <div class="info-label">Current Week</div>
                                         <div class="info-value">Week {{ $currentWeek }}</div>
                                     </div>
-                                </div>
-                                  {{--  
-                                    <div class="col-md-6 text-center">
-                                        <form action="{{ route('user.my.contribution.pay')}}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="group_id" value="{{$group->id}}">
-                                            <input type="hidden" name="user_id" value="{{$user->id}}">
-                                            <input type="hidden" name="amount" value="123">
-                                            <input type="hidden" name="transaction_id" value="1123456">
-                                            <input type="hidden" name="week_number" value="{{ $currentWeek }}">
-                                            <button type="submit" class="pay-button text-white">
-                                                <i class="bi bi-credit-card me-2"></i>Pay Now
-                                            </button>
-                                        </form>
-                                        <small class="text-muted mt-2 d-block">Make your weekly contribution</small>
+                                    <div class="info-item">
+                                        <div class="info-label">Remaining Weeks</div>
+                                        <div class="info-value">{{ $remainingWeeks }} Weeks</div>
                                     </div>
-                                   --}} 
+                                    <div class="info-item">
+                                        <div class="info-label">Status</div>
+                                        <div class="info-value">
+                                            <span class="status-badge bg-success text-white">Active</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                @php
-                use Carbon\Carbon;
-
-// Example
-$start = Carbon::parse($portal->start_date)->startOfDay();
-$end   = Carbon::parse($portal->end_date)->startOfDay();
-
-// Difference in days
-$diffDays = $start->diffInDays($end);
-
-// Total weeks (rounded up)
-$totalWeeks = ceil(($diffDays + 1) / 7);
-
-
-                @endphp
                 <div class="col-md-4">
                     <div class="card dashboard-card">
                         <div class="card-header-custom">
@@ -267,11 +294,11 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                         <div class="card-body">
                             <div class="info-item">
                                 <div class="info-label">Start Date</div>
-                                <div class="info-value">{{ \Carbon\Carbon::parse($portal->start_date)->format('d M Y') }}</div>
+                                <div class="info-value">{{ $portal ? \Carbon\Carbon::parse($portal->start_date)->format('d M Y') : 'N/A' }}</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">End Date</div>
-                                <div class="info-value">{{ \Carbon\Carbon::parse($portal->end_date)->format('d M Y') }}</div>
+                                <div class="info-value">{{ $portal ? \Carbon\Carbon::parse($portal->end_date)->format('d M Y') : 'N/A' }}</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Total Weeks</div>
@@ -289,7 +316,7 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <div class="stats-value">${{ number_format($group->current_amount, 2) }}</div>
+                                    <div class="stats-value">${{ number_format($group->current_amount ?? 0, 2) }}</div>
                                     <div class="stats-label">Weekly Current</div>
                                 </div>
                                 <div class="stats-icon bg-light-primary">
@@ -305,7 +332,7 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <div class="stats-value">${{ number_format($group->target_amount, 2) }}</div>
+                                    <div class="stats-value">${{ number_format($group->target_amount ?? 0, 2) }}</div>
                                     <div class="stats-label">Weekly Target</div>
                                 </div>
                                 <div class="stats-icon bg-light-success">
@@ -321,7 +348,7 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <div class="stats-value">${{ number_format($group->current_amount, 2) }}</div>
+                                    <div class="stats-value">${{ number_format($group->current_amount ?? 0, 2) }}</div>
                                     <div class="stats-label">Total Collected</div>
                                 </div>
                                 <div class="stats-icon bg-light-info">
@@ -337,7 +364,7 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <div class="stats-value">${{ number_format($group->target_amount * $totalWeeks, 2) }}</div>
+                                    <div class="stats-value">${{ number_format(($group->target_amount ?? 0) * $totalWeeks, 2) }}</div>
                                     <div class="stats-label">Total Target</div>
                                 </div>
                                 <div class="stats-icon bg-light-warning">
@@ -359,19 +386,45 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                         <div class="card-body">
                             <div class="info-item">
                                 <div class="info-label">Group Name</div>
-                                <div class="info-value">{{ $group->name }}</div>
+                                <div class="info-value">{{ $group->name ?? 'N/A' }}</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Group Number</div>
-                                <div class="info-value">{{ $group->group_number }}</div>
+                                <div class="info-value">{{ $group->group_number ?? 'N/A' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Project</div>
+                                <div class="info-value">{{ $group->project_name ?? 'N/A' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Group Leader</div>
+                                <div class="info-value">{{ $leader->name ?? 'Not Assigned' }}</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Total Members</div>
                                 <div class="info-value">{{ $groupMembers->count() ?? 0 }} Members</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Project</div>
-                                <div class="info-value">{{ $group->project_name }}</div>
+                                <div class="info-label">All Members</div>
+                                <div class="dropdown member-dropdown">
+                                    <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="membersDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        View All Members
+                                    </button>
+                                    <ul class="dropdown-menu w-100" aria-labelledby="membersDropdown">
+                                        @forelse($groupMembers as $member)
+                                            <li>
+                                                <a class="dropdown-item" href="#">
+                                                    {{ $member->user->name ?? 'Unknown User' }}
+                                                    @if($member->user_id == $leader->id)
+                                                        <span class="badge bg-primary ms-1">Leader</span>
+                                                    @endif
+                                                </a>
+                                            </li>
+                                        @empty
+                                            <li><a class="dropdown-item" href="#">No members found</a></li>
+                                        @endforelse
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -388,7 +441,7 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Portal Name</div>
-                                <div class="info-value">{{ $portal->name }}</div>
+                                <div class="info-value">{{ $portal->name ?? 'N/A' }}</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Portal Status</div>
@@ -398,7 +451,15 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Weeks Remaining</div>
-                                <div class="info-value">{{ $totalWeeks - $currentWeek }} Weeks</div>
+                                <div class="info-value">{{ max(0, $totalWeeks - $currentWeek) }} Weeks</div>
+                            </div>
+                            
+                            <!-- Vision Section -->
+                            <div class="vision-section">
+                                <div class="vision-title">Group Vision</div>
+                                <div class="vision-content">
+                                    {{ $group->project_description ?? 'No vision statement available for this group.' }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -406,7 +467,7 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
             </div>
 
             <!-- Contributions History -->
-             {{-- 
+            {{-- 
             <div class="card dashboard-card">
                 <div class="card-header-custom">
                     <h4 class="card-title text-white mb-0">My Contribution History</h4>
@@ -425,7 +486,7 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreLSE ($contributions as $index => $contribution)
+                                @forelse ($contributions as $index => $contribution)
                                     <tr>
                                         <td class="fw-semibold">{{ $index + 1 }}</td>
                                         <td>
@@ -468,7 +529,6 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
                     </div>
                 </div>
             </div>
-
             --}}
 
         </div>
@@ -478,7 +538,7 @@ $totalWeeks = ceil(($diffDays + 1) / 7);
 <div class="sidenav-overlay"></div>
 <div class="drag-target"></div>
 @endsection
- 
+
 @section('script')
 <script src="{{ asset('admin/app-assets/vendors/js/vendors.min.js')}}"></script>
 <script src="{{ asset('admin/app-assets/vendors/js/extensions/toastr.min.js')}}"></script>

@@ -29,16 +29,16 @@ class DatabaseSeeder extends Seeder
                 'status' => 1,
             ]
         );
-           User::firstOrCreate(
-            ['email' => 'leader@gmail.com'],
-            [
-                'name' => 'Leader',
-                'password' => Hash::make('Leader@123'),
-                'role' => '2',
-                'phone' => '0000000000',
-                'status' => 1,
-            ]
-        );
+        //    User::firstOrCreate(
+        //     ['email' => 'leader@gmail.com'],
+        //     [
+        //         'name' => 'Leader',
+        //         'password' => Hash::make('Leader@123'),
+        //         'role' => '2',
+        //         'phone' => '0000000000',
+        //         'status' => 1,
+        //     ]
+        // );
      
 
 
