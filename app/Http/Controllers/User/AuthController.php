@@ -53,7 +53,6 @@ class AuthController extends Controller
     public function registerStore(StoreUserRequest $request)
     {
         try {
-            dd($request->All());
             DB::beginTransaction();
             $user = new User();
             $user->name = $request->name;

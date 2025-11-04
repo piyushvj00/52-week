@@ -463,7 +463,9 @@ let currentPaymentId = null;
 document.addEventListener("DOMContentLoaded", function() {
     if (feather) feather.replace({ width: 14, height: 14 });
 });
-
+let contributionCount = @json($contributions->sum('amount'));
+let share = @json($share);
+let sharePrice = @json($portal->share_price);
 function viewPaymentDetails(paymentId) {
     currentPaymentId = paymentId;
     // Here you would typically make an AJAX call to get payment details
@@ -500,6 +502,15 @@ function viewPaymentDetails(paymentId) {
                 </div>
                 <div class="mb-3">
                     <strong>Status:</strong> <span class="badge bg-success">Completed</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Total Contribution:</strong> <span class="">${contributionCount}</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Weekly Share:</strong> <span class="">${share}</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Share Price:</strong> <span class="">${sharePrice}</span>
                 </div>
             </div>
             <div class="col-md-6">
