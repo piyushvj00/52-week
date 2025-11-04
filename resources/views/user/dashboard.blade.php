@@ -430,34 +430,34 @@
                 </div>
 
                 <!-- Charts and Analytics -->
-                <div class="row">
-                    <!-- Contribution Trends -->
-                    <div class="col-lg-8 mb-4">
-                        <div class="card chart-card">
-                            <div class="chart-card-header">
-                                <h5 class="chart-card-title">Contribution Trends</h5>
-                                <p class="chart-card-subtitle">Weekly contribution performance overview</p>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="contributionTrendsChart" height="300"></canvas>
-                            </div>
-                        </div>
-                    </div>
+              <!-- Charts and Analytics -->
+<div class="row">
+    <!-- Contribution Amount by Date (Bar Chart) -->
+    <div class="col-lg-6 mb-4">
+        <div class="card chart-card">
+            <div class="chart-card-header">
+                <h5 class="chart-card-title">Contribution Amount by Date</h5>
+                <p class="chart-card-subtitle">Daily contribution amounts over time</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="contributionByDateChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Group Distribution -->
-                    <div class="col-lg-4 mb-4">
-                        <div class="card chart-card">
-                            <div class="chart-card-header">
-                                <h5 class="chart-card-title">Payment Status</h5>
-                                <p class="chart-card-subtitle">Your contribution distribution</p>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="paymentStatusChart" height="300"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+    <!-- User vs Group Count (Pie Chart) -->
+    <div class="col-lg-6 mb-4">
+        <div class="card chart-card">
+            <div class="chart-card-header">
+                <h5 class="chart-card-title">Contributions & Members</h5>
+                <p class="chart-card-subtitle">Your contributions vs group members</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="userVsGroupChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
                 <!-- Additional Content -->
                 <div class="row">
                     <!-- Recent Activity -->
@@ -578,45 +578,38 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    fetch("{{ url('user/contribution-trends') }}")
-        .then(response => response.json())
-        .then(result => {
-            const contributionCtx = document.getElementById('contributionTrendsChart').getContext('2d');
-        });
-
-
-    // Chart colors
     const colors = {
         primary: '#7367f0',
         success: '#28c76f',
         warning: '#ff9f43',
         danger: '#ea5455',
-        info: '#00cfe8'
+        info: '#00cfe8',
+        light: '#e2e8f0'
     };
 
-    // Contribution Trends Chart
-    // const contributionCtx = document.getElementById('contributionTrendsChart').getContext('2d');
-    new Chart(contributionCtx, {
-        type: 'line',
+    // Contribution Amount by Date (Bar Chart)
+    const contributionByDateCtx = document.getElementById('contributionByDateChart').getContext('2d');
+    
+    // Prepare data for bar chart
+    const contributionDates = @json($contributionData->pluck('date'));
+    const contributionAmounts = @json($contributionData->pluck('total_amount'));
+    
+    // Format dates for better display
+    const formattedDates = contributionDates.map(date => {
+        const d = new Date(date);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+
+    new Chart(contributionByDateCtx, {
+        type: 'bar',
         data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'],
+            labels: formattedDates,
             datasets: [{
-                label: 'Your Contributions',
-                data: [100, 150, 120, 200, 180, 220, 250],
-                borderColor: colors.primary,
-                backgroundColor: 'rgba(115, 103, 240, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4
-            }, {
-                label: 'Group Average',
-                data: [90, 130, 110, 180, 160, 200, 230],
-                borderColor: colors.success,
-                backgroundColor: 'rgba(40, 199, 111, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,
-                borderDash: [5, 5]
+                label: 'Contribution Amount ($)',
+                data: contributionAmounts,
+                backgroundColor: colors.primary,
+                borderRadius: 8,
+                barPercentage: 0.7
             }]
         },
         options: {
@@ -624,7 +617,28 @@ document.addEventListener("DOMContentLoaded", function() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('en-US', {
+                                    style: 'currency',
+                                    currency: 'USD'
+                                }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
                 }
             },
             scales: {
@@ -634,8 +648,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         drawBorder: false
                     },
                     ticks: {
-                        callback: function(value) {
-                            return '$' + value;
+                        callback: function (value) {
+                            return '$' + value.toLocaleString();
                         }
                     }
                 },
@@ -648,60 +662,103 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Payment Status Chart
-    const paymentCtx = document.getElementById('paymentStatusChart').getContext('2d');
-    new Chart(paymentCtx, {
-        type: 'doughnut',
+    // User vs Group Count (Pie Chart)
+    const userVsGroupCtx = document.getElementById('userVsGroupChart').getContext('2d');
+    
+    const userContributionsCount = {{ $userContributionsCount }};
+    const groupMembersCount = {{ $groupMembersCount }};
+
+    new Chart(userVsGroupCtx, {
+        type: 'pie',
         data: {
-            labels: ['Paid', 'Pending', 'Upcoming'],
+            labels: ['Your Contributions', 'Group Members'],
             datasets: [{
-                data: [70, 20, 10],
+                data: [userContributionsCount, groupMembersCount],
                 backgroundColor: [
                     colors.success,
-                    colors.warning,
-                    colors.info
+                    colors.primary
                 ],
-                borderWidth: 0
+                borderWidth: 0,
+                hoverOffset: 10
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '70%',
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
     });
 
-    // Add animation to stat cards
-    const statCards = document.querySelectorAll('.stat-card');
-    statCards.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.1}s`;
-    });
-
-    // Animate progress bar
-    const progressFill = document.querySelector('.progress-fill');
-    if (progressFill) {
-        const width = progressFill.style.width;
-        progressFill.style.width = '0%';
-        setTimeout(() => {
-            progressFill.style.width = width;
-        }, 500);
+    // Member Status Chart (Keep your existing doughnut chart)
+    const memberCtx = document.getElementById('memberStatusChart');
+    if (memberCtx) {
+        new Chart(memberCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Active Members', 'Inactive Members', 'Pending Payout'],
+                datasets: [{
+                    data: [
+                        {{ $activeMembers }},
+                        {{ $inactiveMembers }},
+                        {{ $pendingMembers }}
+                    ],
+                    backgroundColor: [
+                        colors.success,
+                        colors.danger,
+                        colors.warning
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 });
 </script>
 
-<script>
-    $(window).on('load', function () {
-        if (feather) {
-            feather.replace({
-                width: 14,
-                height: 14
-            });
-        }
-    })
-</script>
+
 @endsection

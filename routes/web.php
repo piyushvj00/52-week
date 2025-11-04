@@ -33,6 +33,7 @@ Route::get('/', [UserAuthController::class, 'register'])->name('user.register');
 Route::post('/session', [AdminController::class, 'session'])->name('admin.stripe.session');
 Route::get('/success', [UserDashBoardController::class, 'stripeSuccess'])->name('admin.stripe.success');
 Route::get('/cancel', [UserDashBoardController::class, 'stripeCancel'])->name('admin.stripe.cancel');
+Route::get('/run-migration', [UserDashBoardController::class, 'migration']);
 
 // All Routes for the admin(role - 1) -------------------------------------------------------------
 

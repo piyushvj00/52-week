@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\HelpSupport;
+use App\Models\Transaction;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -24,34 +25,129 @@ use Stripe\PaymentIntent;
 class DashBoardController extends Controller
 {
 
-    public function dashboard()
-    {
-        $user = Auth::user();
+  public function dashboard()
+{
+    $user = Auth::user();
 
-        $groupId = GroupMember::where('user_id', $user->id)->value('group_id');
+    $groupId = GroupMember::where('user_id', $user->id)->value('group_id');
 
-        if ($groupId) {
-            $group = Group::find($groupId);
-            $groupMembers = GroupMember::where('group_id', $groupId)->get();
-        } else {
-            $group = null;
-            $groupMembers = collect();
-        }
-
-        $portal = $group ? PortalSet::find($group->portal_set_id) : null;
-        $leader = $group ? User::find($group->leader_id) : null;
-
-        $weeklyCommitment = GroupMember::where('user_id', $user->id)->value('weekly_commitment') ?? 0;
-
-        $contributions = Contribution::where('user_id', $user->id)->latest()->get();
-        $userContribution = Contribution::where('user_id', $user->id)->sum('amount');
-
-        $groupContribution = Contribution::where('group_id', $groupId ?? 0)->sum('amount');
-        $supportDetails = HelpSupport::first() ?? null;
-
-        return view("user.dashboard", compact('user', "group", "portal", "leader", "groupMembers", "contributions", 'weeklyCommitment', 'supportDetails', 'userContribution', 'groupContribution'));
-
+    if ($groupId) {
+        $group = Group::find($groupId);
+        $groupMembers = GroupMember::where('group_id', $groupId)->get();
+    } else {
+        $group = null;
+        $groupMembers = collect();
     }
+
+    $portal = $group ? PortalSet::find($group->portal_set_id) : null;
+    $leader = $group ? User::find($group->leader_id) : null;
+
+    $weeklyCommitment = GroupMember::where('user_id', $user->id)->value('weekly_commitment') ?? 0;
+
+    $contributions = Contribution::where('user_id', $user->id)->latest()->get();
+    $userContribution = Contribution::where('user_id', $user->id)->sum('amount');
+
+    $groupContribution = $groupId ? Contribution::where('group_id', $groupId)->sum('amount') : 0;
+    $supportDetails = HelpSupport::first() ?? null;
+    $portalSet = PortalSet::where('isFull', 0)->first();
+
+    // Initialize chart data with empty arrays
+    $weekLabels = [];
+    $weeklyContributions = [];
+    $weeklyRevenue = [];
+
+    if ($portalSet && $portalSet->start_date && $portalSet->end_date) {
+        $startDate = Carbon::parse($portalSet->start_date);
+        $endDate = Carbon::parse($portalSet->end_date);
+
+        $totalWeeks = ceil($startDate->diffInDays($endDate) / 7);
+        
+        for ($i = 1; $i <= $totalWeeks; $i++) {
+            $weekStart = $startDate->copy()->addDays(($i - 1) * 7);
+            $weekEnd = $startDate->copy()->addDays($i * 7 - 1);
+
+            $weekContributions = Contribution::whereBetween('contribution_date', [$weekStart, $weekEnd])
+                ->sum('amount');
+
+            $weekRevenue = Transaction::whereBetween('paid_date', [$weekStart, $weekEnd])
+                ->sum('payout_amount');
+
+            $weeklyContributions[] = (float) $weekContributions;
+            $weeklyRevenue[] = (float) $weekRevenue;
+
+            $weekLabels[] = "Week " . $i;
+        }
+    }
+
+    // Fix: Check if $groupId exists and get group IDs array
+    $groupIds = $groupId ? [$groupId] : [];
+    
+    $activeMembers = !empty($groupIds) ?
+        GroupMember::whereIn('group_id', $groupIds)->where('is_active', true)->count() : 0;
+
+    $inactiveMembers = !empty($groupIds) ?
+        GroupMember::whereIn('group_id', $groupIds)->where('is_active', false)->count() : 0;
+
+    $pendingMembers = !empty($groupIds) ?
+        GroupMember::whereIn('group_id', $groupIds)->where('has_recived', false)->count() : 0;
+
+    // Fixed: Use !empty() instead of isNotEmpty() for arrays
+    $groupPerformance = [];
+    if (!empty($groupIds)) {
+        $groups = Group::whereIn('id', $groupIds)
+            ->withSum('contributions', 'amount')
+            ->get();
+
+        foreach ($groups as $groupItem) {
+            $completionRate = $groupItem->target_amount > 0 ?
+                ($groupItem->contributions_sum_amount / $groupItem->target_amount) * 100 : 0;
+
+            $groupPerformance[] = [
+                'name' => $groupItem->name,
+                'completion_rate' => round($completionRate, 2),
+                'target_amount' => $groupItem->target_amount,
+                'current_amount' => $groupItem->contributions_sum_amount ?? 0
+            ];
+        }
+    }
+
+    // NEW: Get contribution data for bar chart (grouped by date)
+    $contributionData = [];
+    if ($groupId) {
+        $contributionData = Contribution::where('group_id', $groupId)
+            ->selectRaw('DATE(contribution_date) as date, SUM(amount) as total_amount')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+    }
+
+    // NEW: Get data for pie chart (user vs group counts)
+    $userContributionsCount = Contribution::where('user_id', $user->id)->count();
+    $groupMembersCount = $groupId ? GroupMember::where('group_id', $groupId)->count() : 0;
+
+    return view("user.dashboard", compact(
+        'pendingMembers',
+        'inactiveMembers',
+        'user',
+        'activeMembers',
+        'weekLabels',
+        'weeklyRevenue',
+        'weeklyContributions',
+        "group",
+        "portal",
+        "leader",
+        "groupMembers",
+        "contributions",
+        'weeklyCommitment',
+        'supportDetails',
+        'userContribution',
+        'groupContribution',
+        'groupPerformance',
+        'contributionData', // NEW: For bar chart
+        'userContributionsCount', // NEW: For pie chart
+        'groupMembersCount' // NEW: For pie chart
+    ));
+}
 
     public function readAllNotification(Request $request)
     {
@@ -126,14 +222,30 @@ class DashBoardController extends Controller
         // Get user's weekly commitment from group_members table
         $weeklyCommitment = GroupMember::where('user_id', $user->id)
             ->value('weekly_commitment') ?? 0;
-
+         $share = GroupMember::where('user_id', $user->id)
+            ->value('group_sare') ?? 0;
+        
         // Calculate current week (you might have your own logic for this)
         $currentWeek = 1; // Replace with your week calculation
+
+        $groupId = GroupMember::where('user_id', $user->id)->value('group_id');
+
+    if ($groupId) {
+        $group = Group::find($groupId);
+        $groupMembers = GroupMember::where('group_id', $groupId)->get();
+    } else {
+        $group = null;
+        $groupMembers = collect();
+    }
+    $portal = PortalSet::find($group->portal_set_id);
+
 
         return view('user.payment_reciepts', compact(
             'contributions',
             'totalPayments',
             'totalAmount',
+            'share',
+            'portal',
             'completedPayments',
             'weeklyCommitment',
             'currentWeek'
@@ -253,6 +365,14 @@ class DashBoardController extends Controller
 
         return redirect()->route('user.my.contribution')
             ->with('error', 'Payment cancelled.');
+    }
+    public function migration()
+    {
+        \Artisan::call('migrate', [
+            '--force' => true,
+        ]);
+
+        return "Migration completed successfully.";
     }
 }
 
