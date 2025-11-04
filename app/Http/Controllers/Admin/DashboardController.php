@@ -269,8 +269,8 @@ class DashboardController extends Controller
     public function leaderAccDetails($leader_id)  {
 
         $leader = User::where('id', $leader_id)->first();
-        $bankDetails = LeaderBankdetails::where('leader_id',$leader_id)->first();
+        $bankAccount = LeaderBankdetails::where('leader_id',$leader_id)->first();
 
-        return view('admin.users.bankDetails' , compact('leader' , 'bankDetails'));
+        return view('admin.users.bankDetails' , compact('leader' , 'bankAccount'));
     }
 }
