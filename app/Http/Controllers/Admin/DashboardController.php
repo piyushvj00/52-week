@@ -23,169 +23,69 @@ use Illuminate\Support\Facades\Validator;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
+   public function index()
+{
+    try {
         $portalSet = PortalSet::where('isFull', 0)->first();
-        $groupIds = $portalSet ? Group::where('portal_set_id', $portalSet->id)->pluck('id') : collect();
-        $groupCount = $portalSet ? Group::where('portal_set_id', $portalSet->id)->count() : 0;
-        $groupMember = $groupIds->isNotEmpty() ? GroupMember::whereIn('group_id', $groupIds)->count() : 0;
-        $contribution = $groupIds->isNotEmpty() ? (float) (Contribution::whereIn('group_id', $groupIds)->sum('amount') ?? 0) : 0;
-
-        $startDate = Carbon::parse($portalSet->start_date);
-        $endDate = Carbon::parse($portalSet->end_date);
-
-        $totalWeeks = ceil($startDate->diffInDays($endDate) / 7);
-
-        $weekLabels = [];
-        $weeklyContributions = [];
-        $weeklyRevenue = [];
-
-        for ($i = 1; $i <= $totalWeeks; $i++) {
-
-            $weekStart = $startDate->copy()->addDays(($i - 1) * 7);
-            $weekEnd = $startDate->copy()->addDays($i * 7 - 1);
-
-            $weekContributions = Contribution::whereBetween('contribution_date', [$weekStart, $weekEnd])
-                ->sum('amount');
-
-            $weekRevenue = Transaction::whereBetween('paid_date', [$weekStart, $weekEnd])
-                ->sum('payout_amount');
-
-            $weeklyContributions[] = (float) $weekContributions;
-            $weeklyRevenue[] = (float) $weekRevenue;
-
-            $weekLabels[] = "Week " . $i;
-        }
-        // Member Status Data
-        $activeMembers = $groupIds->isNotEmpty() ?
-            GroupMember::whereIn('group_id', $groupIds)->where('is_active', true)->count() : 0;
-
-        $inactiveMembers = $groupIds->isNotEmpty() ?
-            GroupMember::whereIn('group_id', $groupIds)->where('is_active', false)->count() : 0;
-
-        $pendingMembers = $groupIds->isNotEmpty() ?
-            GroupMember::whereIn('group_id', $groupIds)->where('has_recived', false)->count() : 0;
-
-        // Group Performance Data
-        $groupPerformance = [];
-        if ($groupIds->isNotEmpty()) {
-            $groups = Group::whereIn('id', $groupIds)
-                ->withSum('contributions', 'amount')
-                ->get();
-
-            foreach ($groups as $group) {
-                $completionRate = $group->target_amount > 0 ?
-                    ($group->contributions_sum_amount / $group->target_amount) * 100 : 0;
-
-                $groupPerformance[] = [
-                    'name' => $group->name,
-                    'completion_rate' => round($completionRate, 2),
-                    'target_amount' => $group->target_amount,
-                    'current_amount' => $group->contributions_sum_amount ?? 0
-                ];
-            }
+        
+        if (!$portalSet) {
+            return $this->returnSafeData();
         }
 
-        $recentActivities = collect();
+        $groupIds = Group::where('portal_set_id', $portalSet->id)->pluck('id')->toArray();
+        
+        if (empty($groupIds)) {
+            return $this->returnSafeData($portalSet);
+        }
 
-        // Get recent group members (last 5)
-        $recentMembers = GroupMember::with(['user', 'group'])
-            ->whereIn('group_id', $groupIds)
-            ->latest()
-            ->take(3)
-            ->get()
-            ->map(function ($member) {
-                return [
-                    'type' => 'member_joined',
-                    'title' => 'New Member Joined',
-                    'description' => $member->user->name . ' joined ' . $member->group->name,
-                    'icon' => 'user-plus',
-                    'icon_color' => 'primary',
-                    'time' => $member->created_at,
-                    'amount' => null
-                ];
-            });
+        // Use only simple, direct database queries - no relationships
+        $data = $this->getDashboardData($portalSet, $groupIds);
+        return view('admin.dashboard.index', $data);
 
-        // Get recent contributions (last 5)
-        $recentContributions = Contribution::with(['user', 'group'])
-            ->whereIn('group_id', $groupIds)
-            ->where('status', 'completed')
-            ->latest()
-            ->take(3)
-            ->get()
-            ->map(function ($contribution) {
-                return [
-                    'type' => 'contribution',
-                    'title' => 'Contribution Received',
-                    'description' => '$' . number_format($contribution->amount, 2) . ' from ' . $contribution->user->name,
-                    'icon' => 'dollar-sign',
-                    'icon_color' => 'success',
-                    'time' => $contribution->created_at,
-                    'amount' => $contribution->amount
-                ];
-            });
-
-        // Get recent groups created (last 2)
-        $recentGroups = Group::whereIn('id', $groupIds)
-            ->latest()
-            ->take(2)
-            ->get()
-            ->map(function ($group) {
-                return [
-                    'type' => 'group_created',
-                    'title' => 'New Group Created',
-                    'description' => $group->name . ' started',
-                    'icon' => 'users',
-                    'icon_color' => 'warning',
-                    'time' => $group->created_at,
-                    'amount' => null
-                ];
-            });
-
-        // Get target achievements
-        $targetAchievements = Group::whereIn('id', $groupIds)
-            ->where('current_amount', '>=', \DB::raw('target_amount * 0.8')) // 80% or more completion
-            ->latest()
-            ->take(2)
-            ->get()
-            ->map(function ($group) {
-                $completion = ($group->current_amount / $group->target_amount) * 100;
-                return [
-                    'type' => 'target_achieved',
-                    'title' => 'Target Progress',
-                    'description' => $group->name . ' reached ' . round($completion, 1) . '% of target',
-                    'icon' => 'target',
-                    'icon_color' => 'info',
-                    'time' => $group->updated_at,
-                    'amount' => $completion
-                ];
-            });
-
-        // Merge all activities and sort by time
-        $recentActivities = $recentMembers
-            ->merge($recentContributions)
-            ->merge($recentGroups)
-            ->merge($targetAchievements)
-            ->sortByDesc('time')
-            ->take(6); // Limit to 6 most recent activities
-
-        $latestLeader = Group::with('user')->latest()->first();
-
-        return view('admin.dashboard.index', compact(
-            'groupCount',
-            'contribution',
-            'groupMember',
-            'portalSet',
-            'weeklyContributions',
-            'weeklyRevenue',
-            'weekLabels',
-            'activeMembers',
-            'inactiveMembers',
-            'pendingMembers',
-            'groupPerformance',
-            'recentActivities'
-        ));
+    } catch (\Exception $e) {
+        \Log::error('Dashboard fatal error: ' . $e->getMessage());
+        return $this->returnSafeData();
     }
+}
+
+private function getDashboardData($portalSet, $groupIds)
+{
+    // Simple direct queries only - no Eloquent relationships
+    return [
+        'groupCount' => Group::where('portal_set_id', $portalSet->id)->count(),
+        'contribution' => (float) Contribution::whereIn('group_id', $groupIds)->sum('amount'),
+        'groupMember' => GroupMember::whereIn('group_id', $groupIds)->count(),
+        'portalSet' => $portalSet,
+        'weeklyContributions' => [],
+        'weeklyRevenue' => [],
+        'weekLabels' => [],
+        'activeMembers' => GroupMember::whereIn('group_id', $groupIds)->where('is_active', true)->count(),
+        'inactiveMembers' => GroupMember::whereIn('group_id', $groupIds)->where('is_active', false)->count(),
+        'pendingMembers' => GroupMember::whereIn('group_id', $groupIds)->where('has_recived', false)->count(),
+        'groupPerformance' => [],
+        'recentActivities' => collect(),
+        'latestLeader' => Group::latest()->first()
+    ];
+}
+
+private function returnSafeData($portalSet = null)
+{
+    return view('admin.dashboard.index', [
+        'groupCount' => 0,
+        'contribution' => 0.0,
+        'groupMember' => 0,
+        'portalSet' => $portalSet,
+        'weeklyContributions' => [],
+        'weeklyRevenue' => [],
+        'weekLabels' => [],
+        'activeMembers' => 0,
+        'inactiveMembers' => 0,
+        'pendingMembers' => 0,
+        'groupPerformance' => [],
+        'recentActivities' => collect(),
+        'latestLeader' => null
+    ]);
+}
     public function logout()
     {
         Auth::logout();
