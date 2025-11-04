@@ -23,4 +23,5 @@ class Contribution extends Model
     {
         return $this->belongsTo(Group::class);
     }
+  
 }
