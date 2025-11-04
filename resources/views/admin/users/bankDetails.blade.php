@@ -15,21 +15,16 @@
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
                                     <li class="breadcrumb-item"><a href="{{ route('leader.index') }}">Leaders</a></li>
-                                    <li class="breadcrumb-item"><a href="#">Bank Accounts</a></li>
-                                    <li class="breadcrumb-item active">Details</li>
+                                    <li class="breadcrumb-item"><a hre>Bank Accounts Details</a></li>
                                 </ol>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="content-header-right text-md-end col-md-6 col-12 d-md-block d-none">
-                    <div class="mb-1 breadcrumb-right">
-                        <a href="{{ route('admin.account.details') }}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left me-1"></i> Back to List
-                        </a>
-                    </div>
-                </div>
+                
             </div>
+
+            {{-- 
 
             <div class="content-body">
                 <div class="row">
@@ -84,19 +79,21 @@
                         </div>
                     </div>
 
+                    --}}
+
                     <!-- Bank Account Details -->
                     <div class="col-md-8">
                         <div class="card">
                             <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                                <h4 class="card-title mb-0"><i class="bi bi-bank me-2"></i>Bank Account Details</h4>
+                                <h4 class="card-title mb-0 #f8f8faff"><i class="bi bi-bank me-2 "></i>Bank Account Details</h4>
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-6 mb-3 mt-2">
                                         <label class="form-label text-muted small">Bank Holder Name</label>
                                         <p class="fw-semibold mb-0">{{ $bankAccount->bank_holder_name ?? 'N/A' }}</p>
                                     </div>
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-6 mb-3 mt-2">
                                         <label class="form-label text-muted small">Bank Name</label>
                                         <p class="fw-semibold mb-0">{{ $bankAccount->bank_name ?? 'N/A' }}</p>
                                     </div>
@@ -121,25 +118,27 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-muted small">Account Type</label>
                                         <p class="fw-semibold mb-0">
-                                            <span class="status-badge {{ $bankAccount->account_type == 'business' ? 'status-active' : 'status-inactive' }}">
-                                                {{ ucfirst($bankAccount->account_type) }}
+                                            <span class="status-badge ">
+                                                {{ ucfirst($bankAccount->account_type ?? 'N/A') }}
                                             </span>
                                         </p>
                                     </div>
-                                    @if($bankAccount->payment_details)
+                                    @if($bankAccount && $bankAccount->payment_details)
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label text-muted small">Payment Details</label>
-                                        <p class="fw-semibold mb-0">{{ $bankAccount->payment_details }}</p>
+                                        <p class="fw-semibold mb-0">{{ $bankAccount->payment_details ?? 'N/A' }}</p>
                                     </div>
                                     @endif
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-muted small">Portal Set ID</label>
                                         <p class="fw-semibold mb-0">{{ $bankAccount->portal_set_id ?? 'N/A' }}</p>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small">Created On</label>
-                                        <p class="fw-semibold mb-0">{{ $bankAccount->created_at ? $bankAccount->created_at->format('M d, Y') : 'N/A' }}</p>
-                                    </div>
+                                    {{-- 
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted small">Created On</label>
+                                            <p class="fw-semibold mb-0">{{ $bankAccount->created_at ? $bankAccount->created_at->format('M d, Y') : 'N/A' }}</p>
+                                        </div>
+                                    --}}
                                 </div>
                             </div>
                         </div>
